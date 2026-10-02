@@ -11,7 +11,11 @@ interface Props {
   initialCourtId: number | null;
   busy: boolean;
   error: string | null;
-  onSubmit: (courtId: number, queueIds: number[]) => void;
+  onSubmit: (
+    courtId: number,
+    queueIds: number[],
+    durationMinutes?: number,
+  ) => void;
   onClose: () => void;
 }
 
@@ -27,22 +31,31 @@ export function AssignModal({
   const [courtId, setCourtId] = useState<number | "">(
     initialCourtId ?? courts[0]?.id ?? "",
   );
+  const [matchSize, setMatchSize] = useState<2 | 4>(4);
   const [selected, setSelected] = useState<number[]>(() =>
     entries.slice(0, 4).map((e) => e.id),
   );
+  const [duration, setDuration] = useState<number | "">("");
 
-  // ignore anyone who left the queue since the modal opened
-  const valid = selected.filter((id) => entries.some((e) => e.id === id));
-  const ready = courtId !== "" && valid.length === 4;
+  // ignore anyone who left the queue since the modal opened, and trim to the current match size
+  const valid = selected
+    .filter((id) => entries.some((e) => e.id === id))
+    .slice(0, matchSize);
+  const ready = courtId !== "" && valid.length === matchSize;
 
   function toggle(id: number) {
     setSelected((cur) =>
       cur.includes(id)
         ? cur.filter((x) => x !== id)
-        : cur.length < 4
+        : cur.length < matchSize
           ? [...cur, id]
           : cur,
     );
+  }
+
+  function changeMatchSize(size: 2 | 4) {
+    setMatchSize(size);
+    setSelected((cur) => cur.slice(0, size));
   }
 
   return (
@@ -55,6 +68,59 @@ export function AssignModal({
         <h3 className="text-lg font-semibold text-slate-900">
           Assign players to a court
         </h3>
+
+        <div className="mt-4">
+          <p className="text-sm font-medium text-slate-700">Match type</p>
+          <div className="mt-1 flex gap-2">
+            <button
+              type="button"
+              onClick={() => changeMatchSize(4)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium ${
+                matchSize === 4
+                  ? "border-blue-600 bg-blue-50 text-blue-700"
+                  : "border-slate-300 text-slate-600"
+              }`}
+            >
+              Doubles (4 players)
+            </button>
+            <button
+              type="button"
+              onClick={() => changeMatchSize(2)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium ${
+                matchSize === 2
+                  ? "border-blue-600 bg-blue-50 text-blue-700"
+                  : "border-slate-300 text-slate-600"
+              }`}
+            >
+              Singles (2 players)
+            </button>
+          </div>
+        </div>
+        <div className="mt-4">
+          <p className="text-sm font-medium text-slate-700">Time limit</p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {[
+              { label: "No limit", value: "" as const },
+              { label: "30 min", value: 30 },
+              { label: "1 hr", value: 60 },
+              { label: "1.5 hr", value: 90 },
+              { label: "2 hr", value: 120 },
+            ].map((opt) => (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setDuration(opt.value)}
+                className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+                  duration === opt.value
+                    ? "border-blue-600 bg-blue-50 text-blue-700"
+                    : "border-slate-300 text-slate-600"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <label className="mt-4 block text-sm font-medium text-slate-700">
           Court
@@ -73,7 +139,9 @@ export function AssignModal({
 
         <p className="mt-4 text-sm font-medium text-slate-700">
           Players{" "}
-          <span className="text-slate-500">({valid.length}/4 selected)</span>
+          <span className="text-slate-500">
+            ({valid.length}/{matchSize} selected)
+          </span>
         </p>
         <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200">
           {entries.map((entry) => {
@@ -84,7 +152,7 @@ export function AssignModal({
                   <input
                     type="checkbox"
                     checked={checked}
-                    disabled={!checked && valid.length >= 4}
+                    disabled={!checked && valid.length >= matchSize}
                     onChange={() => toggle(entry.id)}
                     className="h-4 w-4"
                   />
@@ -112,7 +180,9 @@ export function AssignModal({
           </Button>
           <Button
             disabled={busy || !ready}
-            onClick={() => onSubmit(Number(courtId), valid)}
+            onClick={() =>
+              onSubmit(Number(courtId), valid, duration || undefined)
+            }
           >
             {busy ? "Starting…" : "Assign & Start Game"}
           </Button>

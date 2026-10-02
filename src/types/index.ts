@@ -21,6 +21,8 @@ export interface Game {
   status: GameStatus;
   started_at: string | null;
   completed_at: string | null;
+  duration_minutes: number | null;
+  ends_at: string | null;
   court?: Court;
   players?: Player[];
 }
@@ -70,4 +72,5 @@ export interface CreatePlayerPayload {
 export interface AssignGamePayload {
   court_id: number;
   queue_ids: number[];
+  duration_minutes?: number;
 }

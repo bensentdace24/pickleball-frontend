@@ -8,6 +8,7 @@ import { Alert } from "../components/Feedback";
 import { useAsync } from "../hooks/useAsync";
 import { courtsApi, gamesApi, queueApi } from "../services/api";
 import type { Court, Game, QueueEntry } from "../types";
+import { AddToQueueForm } from "../components/admin/AddToQueueForm";
 
 const POLL_MS = 5000;
 
@@ -31,7 +32,7 @@ export default function AdminDashboard() {
     (c) => c.status === "available",
   );
   const eligible = queue.data ?? [];
-  const canAssign = availableCourts.length > 0 && eligible.length >= 4;
+  const canAssign = availableCourts.length > 0 && eligible.length >= 2;
 
   const refreshAll = () =>
     Promise.all([courts.refresh(), queue.refresh(), games.refresh()]);
@@ -64,9 +65,18 @@ export default function AdminDashboard() {
     setAssign({ courtId });
   }
 
-  async function handleAssign(courtId: number, queueIds: number[]) {
+  async function handleAssign(
+    courtId: number,
+    queueIds: number[],
+    durationMinutes?: number,
+  ) {
     const ok = await run(
-      () => gamesApi.assign({ court_id: courtId, queue_ids: queueIds }),
+      () =>
+        gamesApi.assign({
+          court_id: courtId,
+          queue_ids: queueIds,
+          duration_minutes: durationMinutes,
+        }),
       "Game started.",
     );
     if (ok) setAssign(null);
@@ -88,6 +98,14 @@ export default function AdminDashboard() {
       `Game #${finishTarget.id} finished.`,
     );
     setFinishTarget(null);
+  }
+  async function handleAddToQueue(data: {
+    name: string;
+    phone?: string;
+    skill_level?: import("../types").SkillLevel;
+  }) {
+    await queueApi.join(data);
+    await refreshAll();
   }
 
   const refreshError = courts.error ?? queue.error ?? games.error;
@@ -134,6 +152,12 @@ export default function AdminDashboard() {
           }
         />
 
+        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+          <p className="mb-2 text-sm font-semibold text-slate-700">
+            Register &amp; Add to Queue
+          </p>
+          <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
+        </div>
         <div className="grid gap-6 lg:grid-cols-2">
           <QueueSection
             entries={queue.data}
