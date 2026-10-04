@@ -69,8 +69,39 @@ export interface CreatePlayerPayload {
   skill_level?: SkillLevel;
 }
 
+export interface TeamResult {
+  players: Player[];
+  points: number | null;
+  result: "win" | "loss" | "draw" | null;
+}
+
+export interface Game {
+  id: number;
+  status: GameStatus;
+  started_at: string | null;
+  completed_at: string | null;
+  duration_minutes: number | null;
+  ends_at: string | null;
+  court?: Court;
+  players?: Player[];
+  team_a?: TeamResult;
+  team_b?: TeamResult;
+}
+
 export interface AssignGamePayload {
   court_id: number;
-  queue_ids: number[];
+  assignments: { queue_id: number; side: 0 | 1 }[];
   duration_minutes?: number;
+}
+
+export interface RankingRow {
+  rank: number;
+  player_id: number;
+  name: string;
+  total_points: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  games_played: number;
+  avg_seconds: number | null;
 }

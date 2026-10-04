@@ -10,6 +10,7 @@ import type {
   JoinQueuePayload,
   Player,
   QueueEntry,
+  RankingRow,
 } from "../types";
 
 async function unwrap<T>(
@@ -50,5 +51,20 @@ export const gamesApi = {
     unwrap<Game[]>(http.get("/games", { params: { status } })),
   assign: (payload: AssignGamePayload) =>
     unwrap<Game>(http.post("/games", payload)),
-  finish: (id: number) => unwrap<Game>(http.post(`/games/${id}/finish`)),
+  finish: (id: number, teamAScore: number, teamBScore: number) =>
+    unwrap<Game>(
+      http.post(`/games/${id}/finish`, {
+        team_a_score: teamAScore,
+        team_b_score: teamBScore,
+      }),
+    ),
+  smartAssign: (payload: {
+    court_id: number;
+    match_size: 2 | 4;
+    duration_minutes?: number;
+  }) => unwrap<Game>(http.post("/games/smart-assign", payload)),
+};
+
+export const rankingsApi = {
+  list: () => unwrap<RankingRow[]>(http.get("/rankings")),
 };

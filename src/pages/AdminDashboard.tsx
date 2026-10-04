@@ -9,6 +9,9 @@ import { useAsync } from "../hooks/useAsync";
 import { courtsApi, gamesApi, queueApi } from "../services/api";
 import type { Court, Game, QueueEntry } from "../types";
 import { AddToQueueForm } from "../components/admin/AddToQueueForm";
+import { Link } from "react-router-dom";
+import { FinishGameModal } from "../components/admin/FinishGameModal";
+import { SmartAssignModal } from "../components/admin/SmartAssignModal";
 
 const POLL_MS = 5000;
 
@@ -27,6 +30,12 @@ export default function AdminDashboard() {
   const [assign, setAssign] = useState<{ courtId: number | null } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<QueueEntry | null>(null);
   const [finishTarget, setFinishTarget] = useState<Game | null>(null);
+  const [smartAssign, setSmartAssign] = useState<{
+    courtId: number | null;
+  } | null>(null);
+  const [smartResult, setSmartResult] = useState<
+    import("../types").Game | null
+  >(null);
 
   const availableCourts = (courts.data ?? []).filter(
     (c) => c.status === "available",
@@ -59,6 +68,30 @@ export default function AdminDashboard() {
       setBusy(false);
     }
   }
+  async function handleSmartAssign(
+    courtId: number,
+    matchSize: 2 | 4,
+    durationMinutes?: number,
+  ) {
+    setBusy(true);
+    setNotice(null);
+    try {
+      const game = await gamesApi.smartAssign({
+        court_id: courtId,
+        match_size: matchSize,
+        duration_minutes: durationMinutes,
+      });
+      setSmartResult(game);
+      await refreshAll();
+    } catch (e) {
+      setNotice({
+        type: "error",
+        text: e instanceof Error ? e.message : "Something went wrong.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   function openAssign(courtId: number | null) {
     setNotice(null);
@@ -67,14 +100,14 @@ export default function AdminDashboard() {
 
   async function handleAssign(
     courtId: number,
-    queueIds: number[],
+    assignments: { queue_id: number; side: 0 | 1 }[],
     durationMinutes?: number,
   ) {
     const ok = await run(
       () =>
         gamesApi.assign({
           court_id: courtId,
-          queue_ids: queueIds,
+          assignments,
           duration_minutes: durationMinutes,
         }),
       "Game started.",
@@ -91,13 +124,13 @@ export default function AdminDashboard() {
     setCancelTarget(null);
   }
 
-  async function confirmFinish() {
+  async function confirmFinish(teamAScore: number, teamBScore: number) {
     if (!finishTarget) return;
-    await run(
-      () => gamesApi.finish(finishTarget.id),
+    const ok = await run(
+      () => gamesApi.finish(finishTarget.id, teamAScore, teamBScore),
       `Game #${finishTarget.id} finished.`,
     );
-    setFinishTarget(null);
+    if (ok) setFinishTarget(null);
   }
   async function handleAddToQueue(data: {
     name: string;
@@ -113,10 +146,13 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Pickleball Queue · Admin
-          </h1>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/admin/rankings"
+            className="text-sm font-medium text-blue-600 hover:underline"
+          >
+            View Rankings
+          </Link>
           <span className="text-xs text-slate-500">
             Auto-refreshes every 5s
           </span>
@@ -176,6 +212,19 @@ export default function AdminDashboard() {
             busy={busy}
             onFinish={setFinishTarget}
           />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setSmartResult(null);
+                setSmartAssign({ courtId: availableCourts[0]?.id ?? null });
+              }}
+              disabled={busy || !canAssign}
+              className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+            >
+              ⚡ Smart Assign (balanced teams)
+            </button>
+          </div>
         </div>
       </main>
 
@@ -202,15 +251,29 @@ export default function AdminDashboard() {
         onCancel={() => setCancelTarget(null)}
       />
 
-      <ConfirmDialog
-        open={!!finishTarget}
-        busy={busy}
-        title="End this game?"
-        message={`Game #${finishTarget?.id} on ${finishTarget?.court?.name ?? "the court"} will be marked completed and the court freed.`}
-        confirmLabel="Game finished"
-        onConfirm={confirmFinish}
-        onCancel={() => setFinishTarget(null)}
-      />
+      {finishTarget && (
+        <FinishGameModal
+          game={finishTarget}
+          busy={busy}
+          error={notice?.type === "error" ? notice.text : null}
+          onSubmit={confirmFinish}
+          onClose={() => setFinishTarget(null)}
+        />
+      )}
+      {smartAssign && (
+        <SmartAssignModal
+          courts={availableCourts}
+          initialCourtId={smartAssign.courtId}
+          busy={busy}
+          error={notice?.type === "error" ? notice.text : null}
+          result={smartResult}
+          onSubmit={handleSmartAssign}
+          onClose={() => {
+            setSmartAssign(null);
+            setSmartResult(null);
+          }}
+        />
+      )}
     </div>
   );
 }
