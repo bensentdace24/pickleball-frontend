@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import type { ApiError } from "../../services/http";
 import type { SkillLevel } from "../../types";
 import { Button } from "../Button";
+import { MatchTypePicker } from "../MatchTypePicker";
+import type { MatchType } from "../../types";
 
 interface Props {
   busy: boolean;
@@ -9,6 +11,7 @@ interface Props {
     name: string;
     phone?: string;
     skill_level?: SkillLevel;
+    match_type: MatchType;
   }) => Promise<void>;
 }
 
@@ -17,6 +20,7 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
   const [phone, setPhone] = useState("");
   const [skill, setSkill] = useState<SkillLevel | "">("");
   const [error, setError] = useState<string | null>(null);
+  const [matchType, setMatchType] = useState<MatchType>("any");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -26,10 +30,8 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
         name: name.trim(),
         phone: phone.trim() || undefined,
         skill_level: skill || undefined,
+        match_type: matchType,
       });
-      setName("");
-      setPhone("");
-      setSkill("");
     } catch (err) {
       setError((err as ApiError).message ?? "Something went wrong.");
     }
@@ -46,6 +48,14 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
           maxLength={255}
           className="mt-1 w-40 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm sm:w-48"
         />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-slate-600">
+          Wants to play
+        </label>
+        <div className="mt-1">
+          <MatchTypePicker value={matchType} onChange={setMatchType} />
+        </div>
       </div>
       <div>
         <label className="block text-xs font-medium text-slate-600">

@@ -140,6 +140,7 @@ export default function AdminDashboard() {
     name: string;
     phone?: string;
     skill_level?: import("../types").SkillLevel;
+    match_type: import("../types").MatchType;
   }) {
     await queueApi.join(data);
     await refreshAll();
@@ -163,11 +164,8 @@ export default function AdminDashboard() {
     );
   }
 
-  async function handleStartMatchup(matchup: Matchup, courtId: number) {
-    await run(
-      () => matchupsApi.start(matchup.id, courtId),
-      `Matchup started on court.`,
-    );
+  async function handleStartMatchup(matchup: Matchup) {
+    await run(() => matchupsApi.start(matchup.id), "Matchup started.");
   }
 
   async function handleCancelMatchup(matchup: Matchup) {
@@ -240,7 +238,7 @@ export default function AdminDashboard() {
           matchups={upNext.data}
           loading={upNext.loading}
           busy={busy}
-          availableCourts={availableCourts}
+          canStart={availableCourts.length > 0}
           onFormMatchup={() => setFormMatchup(true)}
           onSmartForm={handleSmartForm}
           onStart={handleStartMatchup}

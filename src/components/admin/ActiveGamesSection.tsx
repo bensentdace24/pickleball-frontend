@@ -62,7 +62,17 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
             <tbody className="divide-y divide-slate-100">
               {games.map((game) => (
                 <tr key={game.id}>
-                  <td className="py-3 pr-3 font-semibold">#{game.id}</td>
+                  <td className="py-3 pr-3 font-semibold">
+                    #{game.id}
+                    {game.skill_warning && (
+                      <span
+                        title={game.skill_warning}
+                        className="ml-1 cursor-help"
+                      >
+                        ⚠️
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3 pr-3">{game.court?.name ?? "—"}</td>
                   <td className="py-3 pr-3">
                     {game.players?.map((p) => p.name).join(", ") ?? "—"}

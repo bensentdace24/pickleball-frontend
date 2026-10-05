@@ -5,7 +5,7 @@ import { Alert, Spinner } from "../components/Feedback";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useAsync } from "../hooks/useAsync";
 import { queueApi } from "../services/api";
-import type { SkillLevel } from "../types";
+import type { SkillLevel, MatchType } from "../types";
 
 const STORAGE_KEY = "pickleball_queue_id";
 const POLL_MS = 4000;
@@ -38,6 +38,7 @@ export default function PlayerView() {
     name: string;
     phone?: string;
     skill_level?: SkillLevel;
+    match_type: MatchType;
   }) {
     const entry = await queueApi.join(data);
     localStorage.setItem(STORAGE_KEY, String(entry.id));

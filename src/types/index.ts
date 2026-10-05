@@ -43,6 +43,7 @@ export interface QueueEntry {
   player?: Player;
   position: number | null;
   game?: Game | null;
+  match_type: MatchType;
 }
 
 // Response envelopes
@@ -60,9 +61,13 @@ export interface ApiErrorBody {
 
 // Request payloads
 export type JoinQueuePayload =
-  | { player_id: number }
-  | { name: string; phone?: string; skill_level?: SkillLevel };
-
+  | { player_id: number; match_type?: MatchType }
+  | {
+      name: string;
+      phone?: string;
+      skill_level?: SkillLevel;
+      match_type?: MatchType;
+    };
 export interface CreatePlayerPayload {
   name: string;
   phone?: string;
@@ -86,6 +91,7 @@ export interface Game {
   players?: Player[];
   team_a?: TeamResult;
   team_b?: TeamResult;
+  skill_warning: string | null;
 }
 
 export interface AssignGamePayload {
@@ -114,4 +120,7 @@ export interface Matchup {
   created_at: string;
   team_a: Player[];
   team_b: Player[];
+  skill_warning: string | null;
 }
+
+export type MatchType = "any" | "singles" | "doubles";

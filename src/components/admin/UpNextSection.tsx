@@ -1,5 +1,4 @@
-import { useState } from "react";
-import type { Court, Matchup } from "../../types";
+import type { Matchup } from "../../types";
 import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
@@ -8,10 +7,10 @@ interface Props {
   matchups: Matchup[] | null;
   loading: boolean;
   busy: boolean;
-  availableCourts: Court[];
+  canStart: boolean;
   onFormMatchup: () => void;
   onSmartForm: () => void;
-  onStart: (matchup: Matchup, courtId: number) => void;
+  onStart: (matchup: Matchup) => void;
   onCancel: (matchup: Matchup) => void;
 }
 
@@ -19,15 +18,12 @@ export function UpNextSection({
   matchups,
   loading,
   busy,
-  availableCourts,
+  canStart,
   onFormMatchup,
   onSmartForm,
   onStart,
   onCancel,
 }: Props) {
-  const [startingId, setStartingId] = useState<number | null>(null);
-  const [courtChoice, setCourtChoice] = useState<number | "">("");
-
   const actions = (
     <div className="flex gap-2">
       <Button
@@ -71,6 +67,12 @@ export function UpNextSection({
                 </span>
               </div>
 
+              {m.skill_warning && (
+                <p className="mt-1 rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">
+                  ⚠️ {m.skill_warning}
+                </p>
+              )}
+
               <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-md bg-blue-50 px-2 py-1.5">
                   <p className="font-semibold text-blue-900">Team A</p>
@@ -87,59 +89,27 @@ export function UpNextSection({
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {startingId === m.id ? (
-                  <>
-                    <select
-                      value={courtChoice}
-                      onChange={(e) => setCourtChoice(Number(e.target.value))}
-                      className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
-                    >
-                      <option value="">Pick a court…</option>
-                      {availableCourts.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                    <Button
-                      size="sm"
-                      disabled={busy || courtChoice === ""}
-                      onClick={() => {
-                        onStart(m, Number(courtChoice));
-                        setStartingId(null);
-                        setCourtChoice("");
-                      }}
-                    >
-                      Confirm Start
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={busy}
-                      onClick={() => setStartingId(null)}
-                    >
-                      Back
-                    </Button>
-                  </>
+                {i === 0 ? (
+                  <Button
+                    size="sm"
+                    disabled={busy || !canStart}
+                    onClick={() => onStart(m)}
+                  >
+                    {canStart ? "Start Next" : "No court free yet"}
+                  </Button>
                 ) : (
-                  <>
-                    <Button
-                      size="sm"
-                      disabled={busy || availableCourts.length === 0}
-                      onClick={() => setStartingId(m.id)}
-                    >
-                      Start
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      disabled={busy}
-                      onClick={() => onCancel(m)}
-                    >
-                      Cancel Matchup
-                    </Button>
-                  </>
+                  <span className="text-xs text-slate-400">
+                    Waiting behind Up Next
+                  </span>
                 )}
+                <Button
+                  size="sm"
+                  variant="danger"
+                  disabled={busy}
+                  onClick={() => onCancel(m)}
+                >
+                  Cancel Matchup
+                </Button>
               </div>
             </li>
           ))}

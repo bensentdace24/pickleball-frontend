@@ -3,6 +3,8 @@ import type { ApiError } from "../../services/http";
 import type { SkillLevel } from "../../types";
 import { Button } from "../Button";
 import { Alert } from "../Feedback";
+import { MatchTypePicker } from "../MatchTypePicker";
+import type { MatchType } from "../../types";
 
 interface Props {
   busy: boolean;
@@ -10,6 +12,7 @@ interface Props {
     name: string;
     phone?: string;
     skill_level?: SkillLevel;
+    match_type: MatchType;
   }) => Promise<void>;
 }
 
@@ -19,6 +22,7 @@ export function JoinForm({ busy, onJoin }: Props) {
   const [skill, setSkill] = useState<SkillLevel | "">("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [matchType, setMatchType] = useState<MatchType>("any");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -29,6 +33,7 @@ export function JoinForm({ busy, onJoin }: Props) {
         name: name.trim(),
         phone: phone.trim() || undefined,
         skill_level: skill || undefined,
+        match_type: matchType,
       });
     } catch (err) {
       const apiErr = err as ApiError;
@@ -94,6 +99,14 @@ export function JoinForm({ busy, onJoin }: Props) {
       </div>
 
       {formError && <Alert type="error">{formError}</Alert>}
+      <div>
+        <label className="block text-sm font-medium text-slate-700">
+          What do you want to play?
+        </label>
+        <div className="mt-1">
+          <MatchTypePicker value={matchType} onChange={setMatchType} />
+        </div>
+      </div>
 
       <Button type="submit" disabled={busy || !name.trim()} className="w-full">
         {busy ? "Joining…" : "Join Queue"}

@@ -57,6 +57,7 @@ export function QueueSection({
               <tr>
                 <th className="py-2 pr-3">Queue #</th>
                 <th className="py-2 pr-3">Player</th>
+                <th className="py-2 pr-3">Wants</th>
                 <th className="py-2 pr-3">Joined At</th>
                 <th className="py-2 pr-3">Status</th>
                 <th className="py-2 text-right">Actions</th>
@@ -69,6 +70,9 @@ export function QueueSection({
                     #{entry.queue_number}
                   </td>
                   <td className="py-3 pr-3">{entry.player?.name ?? "—"}</td>
+                  <td className="py-3 pr-3 text-xs capitalize text-slate-500">
+                    {entry.match_type === "any" ? "Either" : entry.match_type}
+                  </td>
                   <td className="py-3 pr-3">{formatTime(entry.joined_at)}</td>
                   <td className="py-3 pr-3">
                     <StatusBadge status={entry.status} />
