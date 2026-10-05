@@ -12,6 +12,10 @@ import { AddToQueueForm } from "../components/admin/AddToQueueForm";
 import { Link } from "react-router-dom";
 import { FinishGameModal } from "../components/admin/FinishGameModal";
 import { SmartAssignModal } from "../components/admin/SmartAssignModal";
+import { UpNextSection } from "../components/admin/UpNextSection";
+import { FormMatchupModal } from "../components/admin/FormMatchupModal";
+import { matchupsApi } from "../services/api";
+import type { Matchup } from "../types";
 
 const POLL_MS = 5000;
 
@@ -24,12 +28,15 @@ export default function AdminDashboard() {
   const courts = useAsync(courtsApi.list, POLL_MS);
   const queue = useAsync(queueApi.list, POLL_MS);
   const games = useAsync(() => gamesApi.list("playing"), POLL_MS);
+  const upNext = useAsync(matchupsApi.list, POLL_MS);
 
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState(false);
   const [assign, setAssign] = useState<{ courtId: number | null } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<QueueEntry | null>(null);
   const [finishTarget, setFinishTarget] = useState<Game | null>(null);
+  const [formMatchup, setFormMatchup] = useState(false);
+
   const [smartAssign, setSmartAssign] = useState<{
     courtId: number | null;
   } | null>(null);
@@ -42,9 +49,6 @@ export default function AdminDashboard() {
   );
   const eligible = queue.data ?? [];
   const canAssign = availableCourts.length > 0 && eligible.length >= 2;
-
-  const refreshAll = () =>
-    Promise.all([courts.refresh(), queue.refresh(), games.refresh()]);
 
   async function run(
     action: () => Promise<unknown>,
@@ -141,21 +145,66 @@ export default function AdminDashboard() {
     await refreshAll();
   }
 
+  async function handleFormMatchup(
+    assignments: { queue_id: number; side: 0 | 1 }[],
+    durationMinutes?: number,
+  ) {
+    const ok = await run(
+      () => matchupsApi.form(assignments, durationMinutes),
+      "Matchup formed — up next.",
+    );
+    if (ok) setFormMatchup(false);
+  }
+
+  async function handleSmartForm() {
+    await run(
+      () => matchupsApi.smartForm(4),
+      "Balanced matchup formed — up next.",
+    );
+  }
+
+  async function handleStartMatchup(matchup: Matchup, courtId: number) {
+    await run(
+      () => matchupsApi.start(matchup.id, courtId),
+      `Matchup started on court.`,
+    );
+  }
+
+  async function handleCancelMatchup(matchup: Matchup) {
+    await run(
+      () => matchupsApi.cancel(matchup.id),
+      "Matchup cancelled, players back in queue.",
+    );
+  }
+
   const refreshError = courts.error ?? queue.error ?? games.error;
+
+  const refreshAll = () =>
+    Promise.all([
+      courts.refresh(),
+      queue.refresh(),
+      games.refresh(),
+      upNext.refresh(),
+    ]);
 
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/admin/rankings"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            View Rankings
-          </Link>
-          <span className="text-xs text-slate-500">
-            Auto-refreshes every 5s
-          </span>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4">
+          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
+            Pickleball Queue · Admin
+          </h1>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/admin/rankings"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              View Rankings
+            </Link>
+            <span className="text-xs text-slate-500">
+              Auto-refreshes every 5s
+            </span>
+          </div>
         </div>
       </header>
 
@@ -187,6 +236,16 @@ export default function AdminDashboard() {
             run(() => courtsApi.create(name), `${name} added.`)
           }
         />
+        <UpNextSection
+          matchups={upNext.data}
+          loading={upNext.loading}
+          busy={busy}
+          availableCourts={availableCourts}
+          onFormMatchup={() => setFormMatchup(true)}
+          onSmartForm={handleSmartForm}
+          onStart={handleStartMatchup}
+          onCancel={handleCancelMatchup}
+        />
 
         <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
           <p className="mb-2 text-sm font-semibold text-slate-700">
@@ -212,19 +271,19 @@ export default function AdminDashboard() {
             busy={busy}
             onFinish={setFinishTarget}
           />
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                setSmartResult(null);
-                setSmartAssign({ courtId: availableCourts[0]?.id ?? null });
-              }}
-              disabled={busy || !canAssign}
-              className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
-            >
-              ⚡ Smart Assign (balanced teams)
-            </button>
-          </div>
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setSmartResult(null);
+              setSmartAssign({ courtId: availableCourts[0]?.id ?? null });
+            }}
+            disabled={busy || !canAssign}
+            className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+          >
+            ⚡ Smart Assign (balanced teams)
+          </button>
         </div>
       </main>
 
@@ -272,6 +331,15 @@ export default function AdminDashboard() {
             setSmartAssign(null);
             setSmartResult(null);
           }}
+        />
+      )}
+      {formMatchup && (
+        <FormMatchupModal
+          entries={eligible}
+          busy={busy}
+          error={notice?.type === "error" ? notice.text : null}
+          onSubmit={handleFormMatchup}
+          onClose={() => setFormMatchup(false)}
         />
       )}
     </div>

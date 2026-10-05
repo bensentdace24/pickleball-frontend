@@ -11,6 +11,7 @@ import type {
   Player,
   QueueEntry,
   RankingRow,
+  Matchup,
 } from "../types";
 
 async function unwrap<T>(
@@ -67,4 +68,32 @@ export const gamesApi = {
 
 export const rankingsApi = {
   list: () => unwrap<RankingRow[]>(http.get("/rankings")),
+};
+
+//matchups
+export const matchupsApi = {
+  list: () => unwrap<Matchup[]>(http.get("/matchups")),
+  form: (
+    assignments: { queue_id: number; side: 0 | 1 }[],
+    durationMinutes?: number,
+  ) =>
+    unwrap<Matchup>(
+      http.post("/matchups", {
+        assignments,
+        duration_minutes: durationMinutes,
+      }),
+    ),
+  smartForm: (matchSize: 2 | 4, durationMinutes?: number) =>
+    unwrap<Matchup>(
+      http.post("/matchups/smart", {
+        match_size: matchSize,
+        duration_minutes: durationMinutes,
+      }),
+    ),
+  start: (matchupId: number, courtId: number) =>
+    unwrap<Game>(
+      http.post(`/matchups/${matchupId}/start`, { court_id: courtId }),
+    ),
+  cancel: (matchupId: number) =>
+    unwrap<Matchup>(http.post(`/matchups/${matchupId}/cancel`)),
 };

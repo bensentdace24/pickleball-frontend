@@ -105,3 +105,13 @@ export interface RankingRow {
   games_played: number;
   avg_seconds: number | null;
 }
+
+export interface Matchup {
+  id: number;
+  status: "pending" | "started" | "cancelled";
+  match_size: 2 | 4;
+  duration_minutes: number | null;
+  created_at: string;
+  team_a: Player[];
+  team_b: Player[];
+}
