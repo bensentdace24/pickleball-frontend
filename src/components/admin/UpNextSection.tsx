@@ -9,7 +9,7 @@ interface Props {
   busy: boolean;
   canStart: boolean;
   onFormMatchup: () => void;
-  onSmartForm: () => void;
+  onSmartForm: (matchSize: 2 | 4) => void;
   onStart: (matchup: Matchup) => void;
   onCancel: (matchup: Matchup) => void;
 }
@@ -38,9 +38,17 @@ export function UpNextSection({
         size="sm"
         variant="secondary"
         disabled={busy || (matchups?.length ?? 0) >= 3}
-        onClick={onSmartForm}
+        onClick={() => onSmartForm(4)}
       >
-        ⚡ Smart Form
+        ⚡ Smart Form (Doubles)
+      </Button>
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={busy || (matchups?.length ?? 0) >= 3}
+        onClick={() => onSmartForm(2)}
+      >
+        ⚡ Smart Form (Singles)
       </Button>
     </div>
   );

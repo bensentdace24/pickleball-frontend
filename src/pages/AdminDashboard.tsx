@@ -137,15 +137,15 @@ export default function AdminDashboard() {
     if (ok) setFinishTarget(null);
   }
   async function handleAddToQueue(data: {
-    name: string;
+    player_id?: number;
+    name?: string;
     phone?: string;
     skill_level?: import("../types").SkillLevel;
     match_type: import("../types").MatchType;
   }) {
-    await queueApi.join(data);
+    await queueApi.join(data as import("../types").JoinQueuePayload);
     await refreshAll();
   }
-
   async function handleFormMatchup(
     assignments: { queue_id: number; side: 0 | 1 }[],
     durationMinutes?: number,
@@ -157,10 +157,10 @@ export default function AdminDashboard() {
     if (ok) setFormMatchup(false);
   }
 
-  async function handleSmartForm() {
+  async function handleSmartForm(matchSize: 2 | 4) {
     await run(
-      () => matchupsApi.smartForm(4),
-      "Balanced matchup formed — up next.",
+      () => matchupsApi.smartForm(matchSize),
+      "Balanced matchup formed.",
     );
   }
 
@@ -269,19 +269,6 @@ export default function AdminDashboard() {
             busy={busy}
             onFinish={setFinishTarget}
           />
-        </div>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              setSmartResult(null);
-              setSmartAssign({ courtId: availableCourts[0]?.id ?? null });
-            }}
-            disabled={busy || !canAssign}
-            className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
-          >
-            ⚡ Smart Assign (balanced teams)
-          </button>
         </div>
       </main>
 

@@ -124,3 +124,19 @@ export interface Matchup {
 }
 
 export type MatchType = "any" | "singles" | "doubles";
+
+// Additional types for player details and stats
+export interface PlayerStats {
+  games_played: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  total_points: number;
+}
+
+export interface PlayerDetail {
+  player: Player;
+  stats: PlayerStats;
+  currently_in_queue: boolean;
+  current_status: QueueStatus | null;
+}

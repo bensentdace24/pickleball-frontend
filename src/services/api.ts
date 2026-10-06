@@ -8,10 +8,11 @@ import type {
   Game,
   GameStatus,
   JoinQueuePayload,
+  Matchup,
   Player,
+  PlayerDetail,
   QueueEntry,
   RankingRow,
-  Matchup,
 } from "../types";
 
 async function unwrap<T>(
@@ -26,8 +27,10 @@ export const playersApi = {
     unwrap<Player[]>(
       http.get("/players", { params: search ? { search } : undefined }),
     ),
+
   create: (payload: CreatePlayerPayload) =>
     unwrap<Player>(http.post("/players", payload)),
+  get: (id: number) => unwrap<PlayerDetail>(http.get(`/players/${id}`)),
 };
 
 export const courtsApi = {
