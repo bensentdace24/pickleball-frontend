@@ -4,6 +4,7 @@ import type { MatchType, Player, PlayerDetail, SkillLevel } from "../../types";
 import { Button } from "../Button";
 import { MatchTypePicker } from "../MatchTypePicker";
 import { PlayerSearchField } from "../PlayerSearchField";
+import { PlayerQrCode } from "./PlayerQrCode";
 
 interface Props {
   busy: boolean;
@@ -18,6 +19,7 @@ interface Props {
 
 export function AddToQueueForm({ busy, onJoin }: Props) {
   const submitLock = useRef(false);
+  const [showQr, setShowQr] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [skill, setSkill] = useState<SkillLevel | "">("");
@@ -34,6 +36,7 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
     setSkill("");
     setMatchType("any");
     setSelected(null);
+    setShowQr(false);
   }
 
   async function submit(e: FormEvent) {
@@ -125,6 +128,15 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
           <button type="button" onClick={reset} className="ml-2 underline">
             Not them? Clear
           </button>
+          {selected.player.qr_token && (
+            <button
+              type="button"
+              onClick={() => setShowQr(true)}
+              className="ml-2 font-semibold underline"
+            >
+              Show QR
+            </button>
+          )}
         </div>
       )}
 
@@ -147,6 +159,14 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
         </Button>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </div>
+
+      {showQr && selected?.player.qr_token && (
+        <PlayerQrCode
+          playerName={selected.player.name}
+          qrToken={selected.player.qr_token}
+          onClose={() => setShowQr(false)}
+        />
+      )}
     </form>
   );
 }
