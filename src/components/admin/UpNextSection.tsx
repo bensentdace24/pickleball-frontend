@@ -2,6 +2,7 @@ import type { Matchup } from "../../types";
 import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
+import { formatWait } from "../../lib/format";
 
 interface Props {
   matchups: Matchup[] | null;
@@ -25,7 +26,7 @@ export function UpNextSection({
   onCancel,
 }: Props) {
   const actions = (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <Button
         size="sm"
         variant="secondary"
@@ -78,6 +79,12 @@ export function UpNextSection({
               {m.skill_warning && (
                 <p className="mt-1 rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">
                   ⚠️ {m.skill_warning}
+                </p>
+              )}
+
+              {formatWait(m.estimated_minutes) && (
+                <p className="mt-1 text-xs text-slate-500">
+                  Est. start: {formatWait(m.estimated_minutes)}
                 </p>
               )}
 

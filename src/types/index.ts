@@ -46,6 +46,7 @@ export interface QueueEntry {
   position: number | null;
   game?: Game | null;
   match_type: MatchType;
+  estimated_minutes?: number | null;
 }
 
 // Response envelopes
@@ -123,6 +124,7 @@ export interface Matchup {
   team_a: Player[];
   team_b: Player[];
   skill_warning: string | null;
+  estimated_minutes?: number | null;
 }
 
 export type MatchType = "any" | "singles" | "doubles";
@@ -152,6 +154,7 @@ export interface MatchupStatusView {
   team_b: Player[];
   skill_warning: string | null;
   position: number | null;
+  estimated_minutes?: number | null;
 }
 
 export interface PlayerStatusResponse {

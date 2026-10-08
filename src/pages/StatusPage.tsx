@@ -3,7 +3,7 @@ import { useAsync } from "../hooks/useAsync";
 import { statusApi } from "../services/api";
 import { Alert, Spinner } from "../components/Feedback";
 import { StatusBadge } from "../components/StatusBadge";
-import { ordinal } from "../lib/format";
+import { formatWait, ordinal } from "../lib/format";
 import type { RecentGame } from "../types";
 
 const POLL_MS = 4000;
@@ -74,6 +74,16 @@ export default function StatusPage() {
                   </p>
                 )}
 
+              {(queue.status === "waiting" || queue.status === "called") &&
+                formatWait(queue.estimated_minutes) && (
+                  <p className="mt-1 text-sm text-slate-700">
+                    Estimated wait:{" "}
+                    <span className="font-semibold">
+                      {formatWait(queue.estimated_minutes)}
+                    </span>
+                  </p>
+                )}
+
               {queue.game && (
                 <div className="mt-4 rounded-lg bg-blue-50 p-3 text-sm">
                   <p className="font-medium text-blue-900">
@@ -97,6 +107,11 @@ export default function StatusPage() {
                   ? "Up Next!"
                   : `Up Next #${matchup.position}`}
               </p>
+              {formatWait(matchup.estimated_minutes) && (
+                <p className="mt-1 text-xs text-slate-600">
+                  Expected to start in {formatWait(matchup.estimated_minutes)}
+                </p>
+              )}
               {matchup.skill_warning && (
                 <p className="mt-1 rounded-md bg-orange-50 px-2 py-1 text-xs text-orange-700">
                   ⚠️ {matchup.skill_warning}
