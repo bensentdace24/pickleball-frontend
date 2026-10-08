@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import type { ApiError } from "../../services/http";
 import type { SkillLevel } from "../../types";
 import { Button } from "../Button";
@@ -23,9 +23,13 @@ export function JoinForm({ busy, onJoin }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [matchType, setMatchType] = useState<MatchType>("any");
+  const submitLock = useRef(false);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
+
     setFieldErrors({});
     setFormError(null);
     try {
@@ -39,6 +43,8 @@ export function JoinForm({ busy, onJoin }: Props) {
       const apiErr = err as ApiError;
       if (apiErr.errors) setFieldErrors(apiErr.errors);
       else setFormError(apiErr.message ?? "Something went wrong.");
+    } finally {
+      submitLock.current = false;
     }
   }
 

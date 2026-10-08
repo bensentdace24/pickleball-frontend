@@ -15,7 +15,10 @@ import { SmartAssignModal } from "../components/admin/SmartAssignModal";
 import { UpNextSection } from "../components/admin/UpNextSection";
 import { FormMatchupModal } from "../components/admin/FormMatchupModal";
 import { matchupsApi } from "../services/api";
+import { PlayerQrCode } from "../components/admin/PlayerQrCode";
+import type { Player } from "../types";
 import type { Matchup } from "../types";
+import { Button } from "../components/Button";
 
 const POLL_MS = 5000;
 
@@ -36,6 +39,9 @@ export default function AdminDashboard() {
   const [cancelTarget, setCancelTarget] = useState<QueueEntry | null>(null);
   const [finishTarget, setFinishTarget] = useState<Game | null>(null);
   const [formMatchup, setFormMatchup] = useState(false);
+
+  const [qrFor, setQrFor] = useState<Player | null>(null);
+  const pending = useAsync(queueApi.pending, POLL_MS);
 
   const [smartAssign, setSmartAssign] = useState<{
     courtId: number | null;
@@ -143,8 +149,11 @@ export default function AdminDashboard() {
     skill_level?: import("../types").SkillLevel;
     match_type: import("../types").MatchType;
   }) {
-    await queueApi.join(data as import("../types").JoinQueuePayload);
+    const entry = await queueApi.join(
+      data as import("../types").JoinQueuePayload,
+    );
     await refreshAll();
+    if (entry.player) setQrFor(entry.player);
   }
   async function handleFormMatchup(
     assignments: { queue_id: number; side: 0 | 1 }[],
@@ -155,6 +164,17 @@ export default function AdminDashboard() {
       "Matchup formed — up next.",
     );
     if (ok) setFormMatchup(false);
+  }
+
+  async function handleApprove(entryId: number) {
+    await run(
+      () => queueApi.approve(entryId),
+      "Approved — added to the queue.",
+    );
+  }
+
+  async function handleReject(entryId: number) {
+    await run(() => queueApi.reject(entryId), "Registration rejected.");
   }
 
   async function handleSmartForm(matchSize: 2 | 4) {
@@ -183,6 +203,7 @@ export default function AdminDashboard() {
       queue.refresh(),
       games.refresh(),
       upNext.refresh(),
+      pending.refresh(),
     ]);
 
   return (
@@ -234,6 +255,53 @@ export default function AdminDashboard() {
             run(() => courtsApi.create(name), `${name} added.`)
           }
         />
+        {pending.data && pending.data.length > 0 && (
+          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <p className="mb-2 text-sm font-semibold text-amber-900">
+              Pending Approvals ({pending.data.length})
+            </p>
+            <ul className="space-y-2">
+              {pending.data.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm"
+                >
+                  <span>
+                    {entry.player?.name}
+                    <span className="ml-2 text-xs text-slate-400">
+                      {entry.match_type === "any" ? "Either" : entry.match_type}
+                    </span>
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="success"
+                      disabled={busy}
+                      onClick={() => handleApprove(entry.id)}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      disabled={busy}
+                      onClick={() => handleReject(entry.id)}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {qrFor && qrFor.qr_token && (
+          <PlayerQrCode
+            playerName={qrFor.name}
+            qrToken={qrFor.qr_token}
+            onClose={() => setQrFor(null)}
+          />
+        )}
         <UpNextSection
           matchups={upNext.data}
           loading={upNext.loading}

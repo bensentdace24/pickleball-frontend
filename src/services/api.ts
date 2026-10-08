@@ -13,6 +13,7 @@ import type {
   PlayerDetail,
   QueueEntry,
   RankingRow,
+  PlayerStatusResponse,
 } from "../types";
 
 async function unwrap<T>(
@@ -48,6 +49,12 @@ export const queueApi = {
   cancel: (id: number) => unwrap<QueueEntry>(http.post(`/queue/${id}/cancel`)),
   callNext: (count = 4) =>
     unwrap<QueueEntry[]>(http.post("/queue/call-next", { count })),
+  selfRegister: (payload: JoinQueuePayload) =>
+    unwrap<QueueEntry>(http.post("/queue/self-register", payload)),
+  pending: () => unwrap<QueueEntry[]>(http.get("/queue/pending")),
+  approve: (id: number) =>
+    unwrap<QueueEntry>(http.post(`/queue/${id}/approve`)),
+  reject: (id: number) => unwrap<QueueEntry>(http.post(`/queue/${id}/reject`)),
 };
 
 export const gamesApi = {
@@ -98,4 +105,9 @@ export const matchupsApi = {
 
   cancel: (matchupId: number) =>
     unwrap<Matchup>(http.post(`/matchups/${matchupId}/cancel`)),
+};
+
+export const statusApi = {
+  getByToken: (token: string) =>
+    unwrap<PlayerStatusResponse>(http.get(`/status/${token}`)),
 };

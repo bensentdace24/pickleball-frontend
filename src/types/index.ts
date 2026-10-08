@@ -1,5 +1,6 @@
 export type SkillLevel = "beginner" | "intermediate" | "advanced";
 export type QueueStatus =
+  | "pending"
   | "waiting"
   | "called"
   | "playing"
@@ -14,6 +15,7 @@ export interface Player {
   phone: string | null;
   skill_level: SkillLevel | null;
   created_at: string;
+  qr_token?: string;
 }
 
 export interface Game {
@@ -139,4 +141,34 @@ export interface PlayerDetail {
   stats: PlayerStats;
   currently_in_queue: boolean;
   current_status: QueueStatus | null;
+}
+
+// Additional types for API error handling
+export interface MatchupStatusView {
+  id: number;
+  status: string;
+  match_size: 2 | 4;
+  team_a: Player[];
+  team_b: Player[];
+  skill_warning: string | null;
+  position: number | null;
+}
+
+export interface PlayerStatusResponse {
+  player: Player;
+  queue: QueueEntry | null;
+  matchup: MatchupStatusView | null;
+  stats: PlayerStats & { avg_seconds: number | null };
+  recent_games: RecentGame[];
+}
+
+// recent games
+export interface RecentGame {
+  game_id: number;
+  court: string;
+  completed_at: string;
+  my_points: number;
+  their_points: number;
+  result: "win" | "loss" | "draw";
+  duration_seconds: number | null;
 }

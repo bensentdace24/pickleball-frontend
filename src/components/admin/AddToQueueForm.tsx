@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import type { ApiError } from "../../services/http";
 import type { MatchType, Player, PlayerDetail, SkillLevel } from "../../types";
 import { Button } from "../Button";
@@ -13,10 +13,11 @@ interface Props {
     phone?: string;
     skill_level?: SkillLevel;
     match_type: MatchType;
-  }) => Promise<void>;
+  }) => Promise<{ qr_token?: string; name: string } | void>;
 }
 
 export function AddToQueueForm({ busy, onJoin }: Props) {
+  const submitLock = useRef(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [skill, setSkill] = useState<SkillLevel | "">("");
@@ -37,6 +38,9 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
+
     setError(null);
     try {
       if (selected) {
@@ -52,6 +56,8 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
       reset();
     } catch (err) {
       setError((err as ApiError).message ?? "Something went wrong.");
+    } finally {
+      submitLock.current = false;
     }
   }
 

@@ -40,7 +40,7 @@ export default function PlayerView() {
     skill_level?: SkillLevel;
     match_type: MatchType;
   }) {
-    const entry = await queueApi.join(data);
+    const entry = await queueApi.selfRegister(data);
     localStorage.setItem(STORAGE_KEY, String(entry.id));
     setQueueId(entry.id);
   }
