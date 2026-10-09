@@ -220,6 +220,18 @@ export default function AdminDashboard() {
             >
               View Rankings
             </Link>
+            <Link
+              to="/admin/history"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              History
+            </Link>
+            <Link
+              to="/admin/analytics"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              Analytics
+            </Link>
             <span className="text-xs text-slate-500">
               Auto-refreshes every 5s
             </span>

@@ -41,12 +41,14 @@ export default function RankingsPage() {
             />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-sm">
+              <table className="w-full min-w-[760px] text-left text-sm">
                 <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
                   <tr>
                     <th className="py-2 pr-3">Rank</th>
                     <th className="py-2 pr-3">Player</th>
                     <th className="py-2 pr-3">W-L-D</th>
+                    <th className="py-2 pr-3">Win %</th>
+                    <th className="py-2 pr-3">Percentile</th>
                     <th className="py-2 pr-3">Points</th>
                     <th className="py-2 pr-3">Games</th>
                     <th className="py-2 pr-3">Avg Time</th>
@@ -62,6 +64,8 @@ export default function RankingsPage() {
                       <td className="py-3 pr-3">
                         {row.wins}-{row.losses}-{row.draws}
                       </td>
+                      <td className="py-3 pr-3">{row.win_rate}%</td>
+                      <td className="py-3 pr-3">Top {row.top_percent}%</td>
                       <td className="py-3 pr-3">{row.total_points}</td>
                       <td className="py-3 pr-3">{row.games_played}</td>
                       <td className="py-3 pr-3">

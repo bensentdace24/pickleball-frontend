@@ -14,6 +14,7 @@ import type {
   QueueEntry,
   RankingRow,
   PlayerStatusResponse,
+  Analytics,
 } from "../types";
 
 async function unwrap<T>(
@@ -58,8 +59,10 @@ export const queueApi = {
 };
 
 export const gamesApi = {
-  list: (status: GameStatus | "all" = "playing") =>
-    unwrap<Game[]>(http.get("/games", { params: { status } })),
+  list: (
+    status: GameStatus | "all" = "playing",
+    opts?: { limit?: number; player?: string },
+  ) => unwrap<Game[]>(http.get("/games", { params: { status, ...opts } })),
   assign: (payload: AssignGamePayload) =>
     unwrap<Game>(http.post("/games", payload)),
   finish: (id: number, teamAScore: number, teamBScore: number) =>
@@ -110,4 +113,8 @@ export const matchupsApi = {
 export const statusApi = {
   getByToken: (token: string) =>
     unwrap<PlayerStatusResponse>(http.get(`/status/${token}`)),
+};
+
+export const analyticsApi = {
+  get: () => unwrap<Analytics>(http.get("/analytics")),
 };
