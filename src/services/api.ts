@@ -65,11 +65,17 @@ export const gamesApi = {
   ) => unwrap<Game[]>(http.get("/games", { params: { status, ...opts } })),
   assign: (payload: AssignGamePayload) =>
     unwrap<Game>(http.post("/games", payload)),
-  finish: (id: number, teamAScore: number, teamBScore: number) =>
+  finish: (
+    id: number,
+    teamAScore: number,
+    teamBScore: number,
+    requeuePlayerIds: number[] = [],
+  ) =>
     unwrap<Game>(
       http.post(`/games/${id}/finish`, {
         team_a_score: teamAScore,
         team_b_score: teamBScore,
+        requeue_player_ids: requeuePlayerIds,
       }),
     ),
   smartAssign: (payload: {

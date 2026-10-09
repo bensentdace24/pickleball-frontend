@@ -134,14 +134,27 @@ export default function AdminDashboard() {
     setCancelTarget(null);
   }
 
-  async function confirmFinish(teamAScore: number, teamBScore: number) {
+  async function confirmFinish(
+    teamAScore: number,
+    teamBScore: number,
+    requeuePlayerIds: number[],
+  ) {
     if (!finishTarget) return;
     const ok = await run(
-      () => gamesApi.finish(finishTarget.id, teamAScore, teamBScore),
-      `Game #${finishTarget.id} finished.`,
+      () =>
+        gamesApi.finish(
+          finishTarget.id,
+          teamAScore,
+          teamBScore,
+          requeuePlayerIds,
+        ),
+      requeuePlayerIds.length > 0
+        ? `Game #${finishTarget.id} finished. ${requeuePlayerIds.length} back in the queue.`
+        : `Game #${finishTarget.id} finished.`,
     );
     if (ok) setFinishTarget(null);
   }
+
   async function handleAddToQueue(data: {
     player_id?: number;
     name?: string;
