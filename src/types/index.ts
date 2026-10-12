@@ -47,6 +47,7 @@ export interface QueueEntry {
   game?: Game | null;
   match_type: MatchType;
   estimated_minutes?: number | null;
+  possible_matches?: PossibleMatch[] | null;
 }
 
 // Response envelopes
@@ -218,4 +219,15 @@ export interface Analytics {
     avg_losing: number | null;
   };
   top_players: RankingRow[];
+}
+
+export interface PossibleMatch {
+  id: number;
+  name: string;
+  phone: string | null;
+  skill_level: SkillLevel | null;
+  wins: number;
+  losses: number;
+  draws: number;
+  active_status: QueueStatus | null;
 }

@@ -33,6 +33,8 @@ export default function AdminDashboard() {
   const games = useAsync(() => gamesApi.list("playing"), POLL_MS);
   const upNext = useAsync(matchupsApi.list, POLL_MS);
 
+  const [approveTarget, setApproveTarget] = useState<QueueEntry | null>(null);
+
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState(false);
   const [assign, setAssign] = useState<{ courtId: number | null } | null>(null);
@@ -185,6 +187,13 @@ export default function AdminDashboard() {
       "Approved — added to the queue.",
     );
   }
+  function requestApprove(entry: QueueEntry) {
+    if (entry.possible_matches && entry.possible_matches.length > 0) {
+      setApproveTarget(entry);
+    } else {
+      handleApprove(entry.id);
+    }
+  }
 
   async function handleReject(entryId: number) {
     await run(() => queueApi.reject(entryId), "Registration rejected.");
@@ -205,6 +214,13 @@ export default function AdminDashboard() {
     await run(
       () => matchupsApi.cancel(matchup.id),
       "Matchup cancelled, players back in queue.",
+    );
+  }
+
+  async function handleLink(entryId: number, playerId: number) {
+    await run(
+      () => queueApi.linkPlayer(entryId, playerId),
+      "Linked to the existing player. You can approve now.",
     );
   }
 
@@ -289,32 +305,81 @@ export default function AdminDashboard() {
               {pending.data.map((entry) => (
                 <li
                   key={entry.id}
-                  className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm"
+                  className="rounded-lg bg-white px-3 py-2 text-sm"
                 >
-                  <span>
-                    {entry.player?.name}
-                    <span className="ml-2 text-xs text-slate-400">
-                      {entry.match_type === "any" ? "Either" : entry.match_type}
+                  <div className="flex items-center justify-between gap-2">
+                    <span>
+                      {entry.player?.name}
+                      {entry.player?.phone && (
+                        <span className="ml-2 text-xs text-slate-400">
+                          {entry.player.phone}
+                        </span>
+                      )}
+                      <span className="ml-2 text-xs text-slate-400">
+                        {entry.match_type === "any"
+                          ? "Either"
+                          : entry.match_type}
+                      </span>
                     </span>
-                  </span>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="success"
-                      disabled={busy}
-                      onClick={() => handleApprove(entry.id)}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      disabled={busy}
-                      onClick={() => handleReject(entry.id)}
-                    >
-                      Reject
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="success"
+                        disabled={busy}
+                        onClick={() => requestApprove(entry)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={busy}
+                        onClick={() => handleReject(entry.id)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
                   </div>
+
+                  {entry.possible_matches &&
+                    entry.possible_matches.length > 0 && (
+                      <div className="mt-2 rounded-md bg-blue-50 px-2 py-2">
+                        <p className="text-xs font-semibold text-blue-900">
+                          Already registered? Possible match:
+                        </p>
+                        <ul className="mt-1 space-y-1">
+                          {entry.possible_matches.map((m) => (
+                            <li
+                              key={m.id}
+                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-blue-800"
+                            >
+                              <span>
+                                {m.name}
+                                {m.phone && (
+                                  <span className="ml-1 text-blue-600">
+                                    ({m.phone})
+                                  </span>
+                                )}{" "}
+                                · {m.wins}W-{m.losses}L-{m.draws}D
+                                {m.active_status && (
+                                  <span className="ml-1 font-semibold text-red-600">
+                                    · already {m.active_status}
+                                  </span>
+                                )}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                disabled={busy || !!m.active_status}
+                                onClick={() => handleLink(entry.id, m.id)}
+                              >
+                                Same person
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                 </li>
               ))}
             </ul>
@@ -420,6 +485,22 @@ export default function AdminDashboard() {
           onClose={() => setFormMatchup(false)}
         />
       )}
+      <ConfirmDialog
+        open={!!approveTarget}
+        busy={busy}
+        title="This might be an existing player"
+        message={
+          approveTarget?.possible_matches?.[0]
+            ? `${approveTarget.player?.name} looks like ${approveTarget.possible_matches[0].name} (${approveTarget.possible_matches[0].wins}W-${approveTarget.possible_matches[0].losses}L). Approving creates a separate new player and splits their record. Use "Same person" if it's them.`
+            : ""
+        }
+        confirmLabel="Approve as new player"
+        onConfirm={async () => {
+          if (approveTarget) await handleApprove(approveTarget.id);
+          setApproveTarget(null);
+        }}
+        onCancel={() => setApproveTarget(null)}
+      />
     </div>
   );
 }

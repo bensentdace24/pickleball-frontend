@@ -45,17 +45,28 @@ export const courtsApi = {
 export const queueApi = {
   list: () => unwrap<QueueEntry[]>(http.get("/queue")),
   get: (id: number) => unwrap<QueueEntry>(http.get(`/queue/${id}`)),
+
   join: (payload: JoinQueuePayload) =>
     unwrap<QueueEntry>(http.post("/queue", payload)),
   cancel: (id: number) => unwrap<QueueEntry>(http.post(`/queue/${id}/cancel`)),
+
   callNext: (count = 4) =>
     unwrap<QueueEntry[]>(http.post("/queue/call-next", { count })),
+
   selfRegister: (payload: JoinQueuePayload) =>
     unwrap<QueueEntry>(http.post("/queue/self-register", payload)),
+
   pending: () => unwrap<QueueEntry[]>(http.get("/queue/pending")),
+
   approve: (id: number) =>
     unwrap<QueueEntry>(http.post(`/queue/${id}/approve`)),
+
   reject: (id: number) => unwrap<QueueEntry>(http.post(`/queue/${id}/reject`)),
+
+  linkPlayer: (id: number, playerId: number) =>
+    unwrap<QueueEntry>(
+      http.post(`/queue/${id}/link-player`, { player_id: playerId }),
+    ),
 };
 
 export const gamesApi = {
