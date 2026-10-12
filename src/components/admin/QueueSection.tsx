@@ -10,7 +10,6 @@ interface Props {
   loading: boolean;
   busy: boolean;
   canAssign: boolean;
-  onCallNext: () => void;
   onAssign: () => void;
   onCancel: (entry: QueueEntry) => void;
 }
@@ -20,25 +19,13 @@ export function QueueSection({
   loading,
   busy,
   canAssign,
-  onCallNext,
   onAssign,
   onCancel,
 }: Props) {
-  const hasWaiting = !!entries?.some((e) => e.status === "waiting");
-
   const actions = (
-    <div className="flex gap-2">
-      <Button
-        variant="secondary"
-        disabled={busy || !hasWaiting}
-        onClick={onCallNext}
-      >
-        Call Next
-      </Button>
-      <Button disabled={busy || !canAssign} onClick={onAssign}>
-        Assign Players
-      </Button>
-    </div>
+    <Button disabled={busy || !canAssign} onClick={onAssign}>
+      Assign Players
+    </Button>
   );
 
   return (

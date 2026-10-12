@@ -9,9 +9,8 @@ import { useAsync } from "../hooks/useAsync";
 import { courtsApi, gamesApi, queueApi } from "../services/api";
 import type { Court, Game, QueueEntry } from "../types";
 import { AddToQueueForm } from "../components/admin/AddToQueueForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FinishGameModal } from "../components/admin/FinishGameModal";
-import { SmartAssignModal } from "../components/admin/SmartAssignModal";
 import { UpNextSection } from "../components/admin/UpNextSection";
 import { FormMatchupModal } from "../components/admin/FormMatchupModal";
 import { matchupsApi } from "../services/api";
@@ -19,6 +18,8 @@ import { PlayerQrCode } from "../components/admin/PlayerQrCode";
 import type { Player } from "../types";
 import type { Matchup } from "../types";
 import { Button } from "../components/Button";
+import { authApi } from "../services/api";
+import { clearAuth, getUser } from "../services/auth";
 
 const POLL_MS = 5000;
 
@@ -45,13 +46,6 @@ export default function AdminDashboard() {
   const [qrFor, setQrFor] = useState<Player | null>(null);
   const pending = useAsync(queueApi.pending, POLL_MS);
 
-  const [smartAssign, setSmartAssign] = useState<{
-    courtId: number | null;
-  } | null>(null);
-  const [smartResult, setSmartResult] = useState<
-    import("../types").Game | null
-  >(null);
-
   const availableCourts = (courts.data ?? []).filter(
     (c) => c.status === "available",
   );
@@ -76,30 +70,6 @@ export default function AdminDashboard() {
       });
       await refreshAll();
       return false;
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function handleSmartAssign(
-    courtId: number,
-    matchSize: 2 | 4,
-    durationMinutes?: number,
-  ) {
-    setBusy(true);
-    setNotice(null);
-    try {
-      const game = await gamesApi.smartAssign({
-        court_id: courtId,
-        match_size: matchSize,
-        duration_minutes: durationMinutes,
-      });
-      setSmartResult(game);
-      await refreshAll();
-    } catch (e) {
-      setNotice({
-        type: "error",
-        text: e instanceof Error ? e.message : "Something went wrong.",
-      });
     } finally {
       setBusy(false);
     }
@@ -235,6 +205,19 @@ export default function AdminDashboard() {
       pending.refresh(),
     ]);
 
+  const navigate = useNavigate();
+  const staff = getUser();
+
+  async function logout() {
+    try {
+      await authApi.logout();
+    } catch {
+      // the token may already be invalid, so just clear it locally
+    }
+    clearAuth();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -264,6 +247,14 @@ export default function AdminDashboard() {
             <span className="text-xs text-slate-500">
               Auto-refreshes every 5s
             </span>
+            {staff && (
+              <span className="text-xs font-medium text-slate-600">
+                {staff.name}
+              </span>
+            )}
+            <Button size="sm" variant="secondary" onClick={logout}>
+              Log out
+            </Button>
           </div>
         </div>
       </header>
@@ -415,9 +406,6 @@ export default function AdminDashboard() {
             loading={queue.loading}
             busy={busy}
             canAssign={canAssign}
-            onCallNext={() =>
-              run(() => queueApi.callNext(4), "Next players called.")
-            }
             onAssign={() => openAssign(null)}
             onCancel={setCancelTarget}
           />
@@ -462,20 +450,7 @@ export default function AdminDashboard() {
           onClose={() => setFinishTarget(null)}
         />
       )}
-      {smartAssign && (
-        <SmartAssignModal
-          courts={availableCourts}
-          initialCourtId={smartAssign.courtId}
-          busy={busy}
-          error={notice?.type === "error" ? notice.text : null}
-          result={smartResult}
-          onSubmit={handleSmartAssign}
-          onClose={() => {
-            setSmartAssign(null);
-            setSmartResult(null);
-          }}
-        />
-      )}
+
       {formMatchup && (
         <FormMatchupModal
           entries={eligible}

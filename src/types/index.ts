@@ -231,3 +231,9 @@ export interface PossibleMatch {
   draws: number;
   active_status: QueueStatus | null;
 }
+
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+}

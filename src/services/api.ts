@@ -2,7 +2,9 @@ import type { AxiosResponse } from "axios";
 import { http } from "./http";
 import type {
   ApiResponse,
+  Analytics,
   AssignGamePayload,
+  AuthUser,
   Court,
   CreatePlayerPayload,
   Game,
@@ -11,10 +13,9 @@ import type {
   Matchup,
   Player,
   PlayerDetail,
+  PlayerStatusResponse,
   QueueEntry,
   RankingRow,
-  PlayerStatusResponse,
-  Analytics,
 } from "../types";
 
 async function unwrap<T>(
@@ -134,4 +135,12 @@ export const statusApi = {
 
 export const analyticsApi = {
   get: () => unwrap<Analytics>(http.get("/analytics")),
+};
+
+export const authApi = {
+  login: (email: string, password: string) =>
+    unwrap<{ token: string; user: AuthUser }>(
+      http.post("/auth/login", { email, password }),
+    ),
+  logout: () => unwrap<null>(http.post("/auth/logout")),
 };
