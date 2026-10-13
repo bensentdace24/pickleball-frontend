@@ -131,6 +131,7 @@ export const matchupsApi = {
 export const statusApi = {
   getByToken: (token: string) =>
     unwrap<PlayerStatusResponse>(http.get(`/status/${token}`)),
+  cancel: (token: string) => unwrap<null>(http.post(`/status/${token}/cancel`)),
 };
 
 export const analyticsApi = {

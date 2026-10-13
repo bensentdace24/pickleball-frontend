@@ -5,6 +5,9 @@ import { Alert, Spinner } from "../components/Feedback";
 import { StatusBadge } from "../components/StatusBadge";
 import { formatWait, ordinal } from "../lib/format";
 import type { RecentGame } from "../types";
+import { useState } from "react";
+import { Button } from "../components/Button";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 const POLL_MS = 4000;
 
@@ -17,13 +20,29 @@ const resultStyles: Record<RecentGame["result"], string> = {
 function minutes(seconds: number | null) {
   return seconds === null ? "—" : `${Math.round(seconds / 60)} min`;
 }
-
 export default function StatusPage() {
   const { token } = useParams<{ token: string }>();
-  const { data, loading, error } = useAsync(
+  const { data, loading, error, refresh } = useAsync(
     () => statusApi.getByToken(token!),
     POLL_MS,
   );
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  async function cancelSpot() {
+    setBusy(true);
+    setCancelError(null);
+    try {
+      await statusApi.cancel(token!);
+      await refresh();
+    } catch (e) {
+      setCancelError(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setConfirmOpen(false);
+      setBusy(false);
+    }
+  }
 
   if (loading && !data) return <Spinner label="Loading your status…" />;
   if (error && !data)
@@ -133,6 +152,23 @@ export default function StatusPage() {
               </div>
             </div>
           )}
+          {queue && ["pending", "waiting", "called"].includes(queue.status) && (
+            <div className="mt-4">
+              {cancelError && (
+                <div className="mb-2">
+                  <Alert type="error">{cancelError}</Alert>
+                </div>
+              )}
+              <Button
+                variant="danger"
+                className="w-full"
+                disabled={busy}
+                onClick={() => setConfirmOpen(true)}
+              >
+                Cancel my spot
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -196,6 +232,20 @@ export default function StatusPage() {
           )}
         </div>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        danger
+        busy={busy}
+        title="Cancel your spot?"
+        message={
+          matchup
+            ? "You're in an Up Next match. Cancelling removes you from the queue and breaks up that match, so your teammates go back to waiting. To play again, register at the front desk."
+            : "You will be removed from the queue. To play again, register at the front desk."
+        }
+        confirmLabel="Cancel my spot"
+        onConfirm={cancelSpot}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }
