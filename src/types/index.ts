@@ -103,19 +103,20 @@ export interface AssignGamePayload {
   assignments: { queue_id: number; side: 0 | 1 }[];
   duration_minutes?: number;
 }
-
 export interface RankingRow {
   rank: number;
   player_id: number;
   name: string;
+  tier: string; // NEW
+  rank_points: number; // NEW
   total_points: number;
   wins: number;
   losses: number;
   draws: number;
   games_played: number;
-  avg_seconds: number | null;
   win_rate: number;
   top_percent: number;
+  avg_seconds: number | null;
 }
 
 export interface Matchup {
@@ -166,6 +167,7 @@ export interface PlayerStatusResponse {
   matchup: MatchupStatusView | null;
   stats: PlayerStats & { avg_seconds: number | null };
   recent_games: RecentGame[];
+  rank: RankInfo; // NEW (no question mark, the backend always sends it)
 }
 
 // recent games
@@ -177,6 +179,7 @@ export interface RecentGame {
   their_points: number;
   result: "win" | "loss" | "draw";
   duration_seconds: number | null;
+  rank_change?: number | null; // NEW
 }
 
 export interface Analytics {
@@ -236,4 +239,13 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+}
+
+export interface RankInfo {
+  points: number;
+  tier: string;
+  tier_index: number;
+  next_tier: string | null;
+  points_to_next: number | null;
+  progress_percent: number;
 }

@@ -8,6 +8,7 @@ import type { RecentGame } from "../types";
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { TierBadge } from "../components/TierBadge";
 
 const POLL_MS = 4000;
 
@@ -53,7 +54,7 @@ export default function StatusPage() {
     );
   if (!data) return null;
 
-  const { player, queue, matchup, stats, recent_games } = data;
+  const { player, queue, matchup, stats, recent_games, rank } = data;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
@@ -169,6 +170,29 @@ export default function StatusPage() {
               </Button>
             </div>
           )}
+        </div>
+        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900">My Rank</h2>
+            <TierBadge tier={rank.tier} />
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900">
+            {rank.points}{" "}
+            <span className="text-sm font-medium text-slate-500">
+              rank points
+            </span>
+          </p>
+          <div className="mt-3 h-2 rounded-full bg-slate-100">
+            <div
+              className="h-2 rounded-full bg-blue-600"
+              style={{ width: `${rank.progress_percent}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            {rank.next_tier
+              ? `${rank.points_to_next} points to ${rank.next_tier}`
+              : "You reached the top tier!"}
+          </p>
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
