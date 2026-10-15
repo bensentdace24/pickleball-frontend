@@ -244,11 +244,22 @@ export default function StatusPage() {
                         {minutes(g.duration_seconds)}
                       </p>
                     </div>
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${resultStyles[g.result]}`}
-                    >
-                      {g.result}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {g.rank_change !== null &&
+                        g.rank_change !== undefined && (
+                          <span
+                            className={`text-xs font-semibold ${g.rank_change >= 0 ? "text-green-600" : "text-red-600"}`}
+                          >
+                            {g.rank_change >= 0 ? "+" : ""}
+                            {g.rank_change} RP
+                          </span>
+                        )}
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${resultStyles[g.result]}`}
+                      >
+                        {g.result}
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
