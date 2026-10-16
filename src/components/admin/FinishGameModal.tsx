@@ -58,7 +58,7 @@ export function FinishGameModal({
         </h3>
         <p className="mt-1 text-sm text-slate-500">{game.court?.name}</p>
 
-        <div className="mt-5 grid grid-cols-2 gap-4">
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-slate-700">
               Team A
@@ -94,7 +94,7 @@ export function FinishGameModal({
         </div>
 
         {players.length > 0 && (
-          <div className="mt-5">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-slate-700">
                 Put back in the queue?

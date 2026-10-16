@@ -225,7 +225,7 @@ export default function AdminDashboard() {
           <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
             Pickleball Queue · Admin
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link
               to="/admin/rankings"
               className="text-sm font-medium text-blue-600 hover:underline"
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
                   key={entry.id}
                   className="rounded-lg bg-white px-3 py-2 text-sm"
                 >
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span>
                       {entry.player?.name}
                       {entry.player?.phone && (
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
           </p>
           <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <QueueSection
             entries={queue.data}
             loading={queue.loading}

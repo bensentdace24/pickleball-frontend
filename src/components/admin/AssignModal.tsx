@@ -161,8 +161,12 @@ export function AssignModal({
                 key={entry.id}
                 className="flex items-center gap-2 px-3 py-2.5 text-sm"
               >
-                <span className="font-semibold">#{entry.queue_number}</span>
-                <span className="flex-1">{entry.player?.name}</span>
+                <span className="shrink-0 font-semibold">
+                  #{entry.queue_number}
+                </span>
+                <span className="min-w-0 flex-1 truncate">
+                  {entry.player?.name}
+                </span>
                 <span className="hidden text-slate-500 sm:inline">
                   {formatTime(entry.joined_at)}
                 </span>
