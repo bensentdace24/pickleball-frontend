@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
+import { AnalyticsChart } from "../components/AnalyticsChart";
 import { EmptyState, Spinner } from "../components/Feedback";
-import { Section } from "../components/Section";
+import { AdminHeader } from "../components/admin/AdminHeader";
 import { useAsync } from "../hooks/useAsync";
 import { analyticsApi } from "../services/api";
 
@@ -8,40 +9,13 @@ function mins(seconds: number | null) {
   return seconds === null ? "—" : `${Math.round(seconds / 60)} min`;
 }
 
-function Card({ label, value }: { label: string; value: string | number }) {
+function StatCard({ label, value, note }: { label: string; value: string | number; note: string }) {
   return (
-    <div className="rounded-lg bg-slate-50 px-4 py-3">
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-xs text-slate-500">{label}</p>
-    </div>
-  );
-}
-
-function Bar({
-  label,
-  value,
-  total,
-}: {
-  label: string;
-  value: number;
-  total: number;
-}) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-  return (
-    <div>
-      <div className="flex justify-between text-sm">
-        <span className="text-slate-700">{label}</span>
-        <span className="text-slate-500">
-          {value} ({pct}%)
-        </span>
-      </div>
-      <div className="mt-1 h-2 rounded-full bg-slate-100">
-        <div
-          className="h-2 rounded-full bg-blue-600"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
+    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{label}</p>
+      <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{value}</p>
+      <p className="mt-1 text-xs text-slate-400">{note}</p>
+    </article>
   );
 }
 
@@ -49,95 +23,105 @@ export default function AnalyticsPage() {
   const { data, loading, error } = useAsync(analyticsApi.get, 15000);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Analytics
-          </h1>
-          <Link
-            to="/admin"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8">
+      <AdminHeader active="analytics" />
 
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6">
-        {error && <p className="text-sm text-red-600">{error}</p>}
+      <main className="mx-auto flex max-w-7xl flex-col gap-5 py-6 sm:py-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Club insights</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Analytics</h1>
+          <p className="mt-1 text-sm text-slate-500">Match results and participation from completed games.</p>
+        </div>
+        {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">Couldn't refresh analytics: {error}</div>}
         {loading && !data ? (
-          <Spinner />
-        ) : !data || data.total_games === 0 ? (
-          <EmptyState
-            title="No finished games yet"
-            hint="Analytics appear once games are finished with scores."
-          />
+          <Spinner label="Loading club analytics…" />
+        ) : !data ? (
+          <EmptyState title="Analytics are unavailable" hint="Check the connection and try again." />
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Card label="Games played" value={data.total_games} />
-              <Card label="Players" value={data.total_players} />
-              <Card label="Doubles games" value={data.doubles_games} />
-              <Card label="Singles games" value={data.singles_games} />
-            </div>
+            <section aria-label="Analytics overview" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard label="Completed matches" value={data.total_games} note="All-time completed games" />
+              <StatCard label="Players" value={data.total_players} note="Players with a completed match" />
+              <StatCard label="Singles matches" value={data.singles_games} note="One player per side" />
+              <StatCard label="Doubles matches" value={data.doubles_games} note="Two players per side" />
+            </section>
 
-            <Section title="Top Players">
-              <ul className="divide-y divide-slate-100 text-sm">
-                {data.top_players.map((p) => (
-                  <li
-                    key={p.player_id}
-                    className="flex items-center justify-between py-2"
-                  >
-                    <span>
-                      <span className="mr-2 font-bold">#{p.rank}</span>
-                      {p.name}
-                    </span>
-                    <span className="text-slate-500">
-                      {p.wins}W-{p.losses}L-{p.draws}D · {p.win_rate}% wins ·{" "}
-                      {p.total_points} pts
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Section>
+            {data.total_games === 0 ? (
+              <EmptyState title="No finished matches yet" hint="Match analytics will appear after games are completed and scored." />
+            ) : (
+              <>
+                <section className="grid gap-4 lg:grid-cols-2">
+                  <AnalyticsChart
+                    title="Participation by format"
+                    description="Completed singles and doubles matches."
+                    values={[
+                      { label: "Singles", value: data.singles_games },
+                      { label: "Doubles", value: data.doubles_games },
+                    ]}
+                    colors={["bg-emerald-700", "bg-amber-500"]}
+                  />
+                  <AnalyticsChart
+                    title="Score margins"
+                    description="Completed games grouped by winning margin."
+                    values={[
+                      { label: "Close · 1–2 points", value: data.scores.close },
+                      { label: "Moderate · 3–5 points", value: data.scores.moderate },
+                      { label: "Wide · 6+ points", value: data.scores.lopsided },
+                    ]}
+                    colors={["bg-sky-600", "bg-amber-500", "bg-rose-500"]}
+                  />
+                  <div className="lg:col-span-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                    Average final score: <span className="font-semibold text-slate-900">{data.scores.avg_winning ?? "—"} to {data.scores.avg_losing ?? "—"}</span>
+                  </div>
+                </section>
 
-            <Section title="Score Margins">
-              <div className="flex flex-col gap-3">
-                <Bar
-                  label="Close games (won by 1 to 2)"
-                  value={data.scores.close}
-                  total={data.total_games}
-                />
-                <Bar
-                  label="Moderate (won by 3 to 5)"
-                  value={data.scores.moderate}
-                  total={data.total_games}
-                />
-                <Bar
-                  label="Lopsided (won by 6+)"
-                  value={data.scores.lopsided}
-                  total={data.total_games}
-                />
-              </div>
-              <p className="mt-3 text-xs text-slate-500">
-                Average final score: {data.scores.avg_winning ?? "—"} to{" "}
-                {data.scores.avg_losing ?? "—"}
-              </p>
-            </Section>
+                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <h2 className="font-semibold text-slate-950">Match duration</h2>
+                      <p className="mt-1 text-xs text-slate-500">Based on {data.time.counted_games} games between 1 minute and 3 hours.</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800">Observed data</span>
+                  </div>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <StatCard label="Average" value={mins(data.time.avg_seconds)} note="Typical match length" />
+                    <StatCard label="Fastest" value={mins(data.time.fastest_seconds)} note="Shortest counted match" />
+                    <StatCard label="Longest" value={mins(data.time.longest_seconds)} note="Longest counted match" />
+                  </div>
+                </section>
 
-            <Section title="Time to Complete">
-              <div className="grid grid-cols-3 gap-3">
-                <Card label="Average" value={mins(data.time.avg_seconds)} />
-                <Card label="Fastest" value={mins(data.time.fastest_seconds)} />
-                <Card label="Longest" value={mins(data.time.longest_seconds)} />
-              </div>
-              <p className="mt-3 text-xs text-slate-500">
-                Based on {data.time.counted_games} games. Games under 1 minute
-                or over 3 hours are left out (test clicks or games finished
-                late).
-              </p>
-            </Section>
+                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <h2 className="font-semibold text-slate-950">Top players</h2>
+                      <p className="mt-1 text-xs text-slate-500">Ranked from completed match results.</p>
+                    </div>
+                    <Link to="/admin/rankings" className="text-xs font-semibold text-emerald-800 hover:underline">Full rankings →</Link>
+                  </div>
+                  {data.top_players.length === 0 ? (
+                    <EmptyState title="No ranked players yet" />
+                  ) : (
+                    <ol className="grid gap-2 md:grid-cols-2">
+                      {data.top_players.map((player) => (
+                        <li key={player.player_id} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-3 transition hover:bg-emerald-50/70">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-900 text-xs font-bold text-white">#{player.rank}</span>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-semibold text-slate-900">{player.name}</p>
+                              <p className="text-xs text-slate-500">{player.wins}W · {player.losses}L · {player.draws}D</p>
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-sm font-bold text-emerald-900">{player.win_rate}%</p>
+                            <p className="text-[10px] text-slate-500">{player.total_points} pts</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </section>
+              </>
+            )}
           </>
         )}
       </main>

@@ -25,8 +25,6 @@ export function PlayerSearchField({
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (query.trim().length < 2) {
-      setResults([]);
-      setOpen(false);
       return;
     }
 
@@ -65,7 +63,14 @@ export function PlayerSearchField({
       </label>
       <input
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          const nextQuery = e.target.value;
+          setQuery(nextQuery);
+          if (nextQuery.trim().length < 2) {
+            setResults([]);
+            setOpen(false);
+          }
+        }}
         onFocus={() => results.length > 0 && setOpen(true)}
         maxLength={255}
         disabled={disabled}

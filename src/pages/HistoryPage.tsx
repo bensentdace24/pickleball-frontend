@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
 import { EmptyState, Spinner } from "../components/Feedback";
+import { AdminHeader } from "../components/admin/AdminHeader";
 import { useAsync } from "../hooks/useAsync";
 import { gamesApi } from "../services/api";
 import type { TeamResult } from "../types";
@@ -46,21 +46,14 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Match History
-          </h1>
-          <Link
-            to="/admin"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
+      <AdminHeader active="history" />
 
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Past play</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Match history</h1>
+          <p className="mt-1 text-sm text-slate-500">Search completed games by player.</p>
+        </div>
         <form onSubmit={submit} className="mb-4 flex gap-2">
           <input
             value={search}
@@ -88,7 +81,7 @@ export default function HistoryPage() {
           )}
         </form>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           {error && <p className="text-sm text-red-600">{error}</p>}
           {loading && !data ? (
             <Spinner />

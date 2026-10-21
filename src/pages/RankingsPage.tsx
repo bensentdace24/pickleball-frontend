@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { AdminHeader } from "../components/admin/AdminHeader";
 import { useAsync } from "../hooks/useAsync";
 import { rankingsApi } from "../services/api";
 import { EmptyState, Spinner } from "../components/Feedback";
@@ -18,25 +18,16 @@ export default function RankingsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Player Rankings
-          </h1>
-
-          <Link
-            to="/admin"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
+      <AdminHeader active="rankings" />
 
       {/* Main Content */}
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Player standings</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Rankings</h1>
+          <p className="mt-1 text-sm text-slate-500">Results and points from completed games.</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           {/* Error Message */}
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Button } from "../components/Button";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { TierBadge } from "../components/TierBadge";
+import { MiniCourt } from "../components/MiniCourt";
 
 const POLL_MS = 4000;
 
@@ -55,12 +56,32 @@ export default function StatusPage() {
   if (!data) return null;
 
   const { player, queue, matchup, stats, recent_games, rank } = data;
+  const gameTeamA = queue?.game?.team_a?.players ?? [];
+  const gameTeamB = queue?.game?.team_b?.players ?? [];
+  const playerIsOnTeamA = gameTeamA.some((teamPlayer) => teamPlayer.id === player.id);
+  const ownTeam = playerIsOnTeamA ? gameTeamA : gameTeamB;
+  const opposingTeam = playerIsOnTeamA ? gameTeamB : gameTeamA;
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto flex max-w-md flex-col gap-4">
-        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <h1 className="text-lg font-bold text-slate-900">{player.name}</h1>
+    <div className="min-h-screen px-4 py-8 sm:py-12">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-700">Player waiting room</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Welcome, {player.name}</h1>
+            <p className="mt-1 text-sm text-slate-500">Your place in line and match updates are refreshed automatically.</p>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Live updates · every 4 sec
+          </div>
+        </div>
+
+        {error && <div className="mb-4"><Alert type="error">Live update issue: {error}. Showing your last update.</Alert></div>}
+
+        <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-700">Your queue status</p>
 
           {!queue && (
             <p className="mt-3 text-sm text-slate-500">
@@ -76,56 +97,62 @@ export default function StatusPage() {
 
           {queue && queue.status !== "pending" && (
             <>
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-4 flex items-center justify-between gap-3">
                 <StatusBadge status={queue.status} />
-                <span className="text-sm text-slate-500">
-                  #{queue.queue_number}
-                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Queue #{queue.queue_number}</span>
               </div>
 
               {queue.position !== null &&
                 (queue.status === "waiting" || queue.status === "called") && (
-                  <p className="mt-2 text-sm text-slate-700">
-                    You're{" "}
-                    <span className="font-semibold">
-                      {ordinal(queue.position)}
-                    </span>{" "}
-                    in line.
-                  </p>
-                )}
-
-              {(queue.status === "waiting" || queue.status === "called") &&
-                formatWait(queue.estimated_minutes) && (
-                  <p className="mt-1 text-sm text-slate-700">
-                    Estimated wait:{" "}
-                    <span className="font-semibold">
-                      {formatWait(queue.estimated_minutes)}
-                    </span>
-                  </p>
+                  <div className="mt-4 rounded-xl bg-slate-900 p-5 text-white shadow-md shadow-slate-900/10 sm:p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">Your place in line</p>
+                    <div className="mt-1 flex items-end justify-between gap-4">
+                      <p className="text-5xl font-bold tracking-tight">{ordinal(queue.position)}</p>
+                      <div className="rounded-xl bg-white/10 px-3 py-2 text-right ring-1 ring-white/15">
+                        <p className="text-xl font-bold">{Math.max(queue.position - 1, 0)}</p>
+                      <p className="text-[10px] text-slate-300">ahead of you</p>
+                      </div>
+                    </div>
+                    {(queue.status === "waiting" || queue.status === "called") && formatWait(queue.estimated_minutes) && (
+                      <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-300 px-3 py-1.5 text-xs font-bold text-amber-950">
+                        <span aria-hidden="true">◷</span> Estimated wait: {formatWait(queue.estimated_minutes)}
+                      </p>
+                    )}
+                  </div>
                 )}
 
               {queue.game && (
                 <div className="mt-4 rounded-lg bg-blue-50 p-3 text-sm">
-                  <p className="font-medium text-blue-900">
+                  <p className="font-semibold text-blue-950">
                     {queue.status === "completed" ? "Played on" : "Playing on"}{" "}
                     {queue.game.court?.name}
                   </p>
-                  {queue.game.players && (
-                    <p className="mt-1 text-blue-700">
-                      With: {queue.game.players.map((p) => p.name).join(", ")}
-                    </p>
+                  {queue.status === "playing" && queue.game.court && (
+                    <div className="mt-3">
+                      <MiniCourt
+                        mode="player"
+                        compact
+                        court={{ ...queue.game.court, status: "playing", active_game: queue.game }}
+                      />
+                    </div>
                   )}
+                  {opposingTeam.length > 0 ? (
+                    <div className="mt-2 grid gap-1 text-xs text-blue-800 sm:grid-cols-2">
+                      <p><span className="font-semibold">With:</span> {ownTeam.map((p) => p.name).join(" · ") || player.name}</p>
+                      <p><span className="font-semibold">Opponents:</span> {opposingTeam.map((p) => p.name).join(" · ")}</p>
+                    </div>
+                  ) : queue.game.players && <p className="mt-2 text-xs text-blue-800">On court: {queue.game.players.map((p) => p.name).join(" · ")}</p>}
                 </div>
               )}
             </>
           )}
 
           {matchup && (
-            <div className="mt-4 rounded-lg border border-slate-200 p-3">
-              <p className="text-xs font-semibold uppercase text-slate-500">
+            <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50/60 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-800">
                 {matchup.position === 1
-                  ? "Up Next!"
-                  : `Up Next #${matchup.position}`}
+                  ? "Your match is next"
+                  : `Upcoming matchup · #${matchup.position}`}
               </p>
               {formatWait(matchup.estimated_minutes) && (
                 <p className="mt-1 text-xs text-slate-600">
@@ -138,15 +165,15 @@ export default function StatusPage() {
                 </p>
               )}
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div className="rounded-md bg-blue-50 px-2 py-1.5">
-                  <p className="font-semibold text-blue-900">Team A</p>
-                  <p className="text-blue-800">
+                <div className="rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200">
+                  <p className="text-xs font-bold uppercase tracking-wider text-sky-800">Team A</p>
+                  <p className="mt-1 text-blue-950">
                     {matchup.team_a.map((p) => p.name).join(", ")}
                   </p>
                 </div>
-                <div className="rounded-md bg-amber-50 px-2 py-1.5">
-                  <p className="font-semibold text-amber-900">Team B</p>
-                  <p className="text-amber-800">
+                <div className="rounded-xl bg-white px-3 py-2 ring-1 ring-amber-100">
+                  <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Team B</p>
+                  <p className="mt-1 text-amber-950">
                     {matchup.team_b.map((p) => p.name).join(", ")}
                   </p>
                 </div>
@@ -171,7 +198,7 @@ export default function StatusPage() {
             </div>
           )}
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-slate-900">My Rank</h2>
             <TierBadge tier={rank.tier} />
@@ -195,7 +222,7 @@ export default function StatusPage() {
           </p>
         </div>
 
-        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:col-span-2">
           <h2 className="text-sm font-semibold text-slate-900">My Record</h2>
 
           {stats.games_played === 0 ? (
@@ -265,6 +292,7 @@ export default function StatusPage() {
               </ul>
             </>
           )}
+        </div>
         </div>
       </div>
       <ConfirmDialog

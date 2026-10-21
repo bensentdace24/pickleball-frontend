@@ -49,7 +49,7 @@ export function JoinForm({ busy, onJoin }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto flex max-w-md flex-col gap-4">
+    <form onSubmit={submit} className="mx-auto flex max-w-md flex-col gap-4 rounded-2xl border border-white/80 bg-white p-5 shadow-xl shadow-emerald-950/10 ring-1 ring-slate-200/70 sm:p-7">
       <div>
         <label className="block text-sm font-medium text-slate-700">
           Full name

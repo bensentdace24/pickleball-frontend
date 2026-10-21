@@ -14,11 +14,12 @@ const styles: Record<Status, string> = {
 };
 
 export function StatusBadge({ status }: { status: Status }) {
+  const label = status === "playing" ? "In play" : status;
   return (
     <span
       className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${styles[status]}`}
     >
-      {status}
+      {label}
     </span>
   );
 }

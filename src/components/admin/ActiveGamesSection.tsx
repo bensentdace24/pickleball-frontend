@@ -4,7 +4,7 @@ import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
 import { StatusBadge } from "../StatusBadge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   games: Game[] | null;
@@ -13,11 +13,11 @@ interface Props {
   onFinish: (game: Game) => void;
 }
 function useNow(intervalMs = 1000) {
-  const [now, setNow] = useState(Date.now());
-  useState(() => {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), intervalMs);
     return () => clearInterval(id);
-  });
+  }, [intervalMs]);
   return now;
 }
 
@@ -55,13 +55,13 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
                 <th className="py-2 pr-3">Players</th>
                 <th className="py-2 pr-3">Started At</th>
                 <th className="py-2 pr-3">Status</th>
-                <th className="py-2 text-right">Actions</th>
                 <th className="py-2 pr-3">Time</th>
+                <th className="py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {games.map((game) => (
-                <tr key={game.id}>
+                <tr key={game.id} className="transition-colors hover:bg-sky-50/50">
                   <td className="py-3 pr-3 font-semibold">
                     #{game.id}
                     {game.skill_warning && (

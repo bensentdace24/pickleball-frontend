@@ -3,7 +3,7 @@ import type { Court } from "../../types";
 import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
-import { StatusBadge } from "../StatusBadge";
+import { MiniCourt } from "../MiniCourt";
 
 interface Props {
   courts: Court[] | null;
@@ -56,29 +56,13 @@ export function CourtsSection({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {courts.map((court) => (
-            <div
-              key={court.id}
-              className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-semibold text-slate-900">{court.name}</h3>
-                <StatusBadge status={court.status} />
-              </div>
-
-              {court.status === "playing" && court.active_game && (
-                <p className="text-sm text-slate-600">
-                  Game #{court.active_game.id}
-                  {court.active_game.players && (
-                    <>
-                      {" "}
-                      ·{" "}
-                      {court.active_game.players.map((p) => p.name).join(", ")}
-                    </>
-                  )}
-                </p>
-              )}
-
-              <div className="mt-auto flex flex-wrap gap-2">
+            <div key={court.id} className="court-admin-card">
+              <MiniCourt
+                court={court}
+                mode="admin"
+                onCourtClick={court.status === "available" && canAssign && !busy ? () => onAssign(court.id) : undefined}
+              />
+              <div className="mt-auto flex flex-wrap gap-2 p-4 pt-0">
                 {court.status === "available" && (
                   <>
                     <Button
@@ -86,7 +70,7 @@ export function CourtsSection({
                       disabled={busy || !canAssign}
                       onClick={() => onAssign(court.id)}
                     >
-                      Assign Players
+                      Assign players
                     </Button>
                     <Button
                       size="sm"
@@ -94,7 +78,7 @@ export function CourtsSection({
                       disabled={busy}
                       onClick={() => onSetStatus(court, "maintenance")}
                     >
-                      Put on Maintenance
+                      Put on maintenance
                     </Button>
                   </>
                 )}
@@ -105,7 +89,7 @@ export function CourtsSection({
                     disabled={busy}
                     onClick={() => onSetStatus(court, "available")}
                   >
-                    Make Available
+                    Make available
                   </Button>
                 )}
                 {court.status === "playing" && (
