@@ -29,7 +29,15 @@ export function QueueSection({
   );
 
   return (
-    <Section title="Queue" action={actions}>
+    <Section
+      title="Waiting Queue"
+      action={
+        <div className="flex items-center gap-2">
+          {entries && <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-800">{entries.length} waiting</span>}
+          {actions}
+        </div>
+      }
+    >
       {loading && !entries ? (
         <Spinner />
       ) : !entries || entries.length === 0 ? (
@@ -38,46 +46,26 @@ export function QueueSection({
           hint="Players who join the queue will show up here."
         />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="py-2 pr-3">Queue #</th>
-                <th className="py-2 pr-3">Player</th>
-                <th className="py-2 pr-3">Wants</th>
-                <th className="py-2 pr-3">Joined At</th>
-                <th className="py-2 pr-3">Status</th>
-                <th className="py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {entries.map((entry) => (
-                <tr key={entry.id}>
-                  <td className="py-3 pr-3 font-semibold">
-                    #{entry.queue_number}
-                  </td>
-                  <td className="py-3 pr-3">{entry.player?.name ?? "—"}</td>
-                  <td className="py-3 pr-3 text-xs capitalize text-slate-500">
-                    {entry.match_type === "any" ? "Either" : entry.match_type}
-                  </td>
-                  <td className="py-3 pr-3">{formatTime(entry.joined_at)}</td>
-                  <td className="py-3 pr-3">
-                    <StatusBadge status={entry.status} />
-                  </td>
-                  <td className="py-3 text-right">
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      disabled={busy}
-                      onClick={() => onCancel(entry)}
-                    >
-                      Cancel Queue
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="divide-y divide-slate-100">
+          {entries.map((entry, index) => (
+            <article key={entry.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-sm font-bold text-slate-700">{entry.position ?? index + 1}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <h3 className="truncate text-sm font-bold text-slate-900">{entry.player?.name ?? "Unknown player"}</h3>
+                  <span className="text-xs text-slate-400">#{entry.queue_number}</span>
+                  {entry.player?.skill_level && <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold uppercase text-sky-800">{entry.player.skill_level}</span>}
+                  <StatusBadge status={entry.status} />
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  {entry.match_type === "any" ? "Either format" : `${entry.match_type} requested`}
+                  <span className="mx-1.5">·</span>
+                  Joined {formatTime(entry.joined_at)}
+                </p>
+              </div>
+              <Button size="sm" variant="danger" disabled={busy} onClick={() => onCancel(entry)}>Remove</Button>
+            </article>
+          ))}
         </div>
       )}
     </Section>

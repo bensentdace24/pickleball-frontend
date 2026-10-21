@@ -4,7 +4,7 @@ import { Button } from "../Button";
 type AdminPage = "dashboard" | "rankings" | "history" | "analytics";
 
 const links: { page: AdminPage; label: string; to: string }[] = [
-  { page: "dashboard", label: "Dashboard", to: "/admin" },
+  { page: "dashboard", label: "Court Floor", to: "/admin" },
   { page: "rankings", label: "Rankings", to: "/admin/rankings" },
   { page: "history", label: "History", to: "/admin/history" },
   { page: "analytics", label: "Analytics", to: "/admin/analytics" },
@@ -14,11 +14,13 @@ export function AdminHeader({
   active,
   staffName,
   activeMatches,
+  syncIntervalSeconds,
   onLogout,
 }: {
   active: AdminPage;
   staffName?: string;
   activeMatches?: number;
+  syncIntervalSeconds?: number;
   onLogout?: () => void;
 }) {
   return (
@@ -36,11 +38,17 @@ export function AdminHeader({
             </svg>
           </span>
           <span>
-            <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-sky-700">Court operations</span>
-            <span className="block text-base font-extrabold tracking-tight text-slate-950 sm:text-lg">Pickleball Queue</span>
+            <span className="block text-base font-extrabold tracking-tight text-slate-950 sm:text-lg">Pickleball Queue · Admin</span>
+            <span className="block text-[11px] text-slate-500">Live court rally telemetry &amp; queue operations</span>
           </span>
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
+          {syncIntervalSeconds !== undefined && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-emerald-500" />
+              Syncs every {syncIntervalSeconds}s
+            </span>
+          )}
           {activeMatches !== undefined && (
             <span className="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 sm:inline-flex">
               <span className="relative flex h-2 w-2">

@@ -6,10 +6,10 @@ import { QueueSection } from "../components/admin/QueueSection";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Alert } from "../components/Feedback";
 import { useAsync } from "../hooks/useAsync";
-import { courtsApi, gamesApi, queueApi } from "../services/api";
+import { analyticsApi, courtsApi, gamesApi, playersApi, queueApi } from "../services/api";
 import type { Court, Game, QueueEntry } from "../types";
 import { AddToQueueForm } from "../components/admin/AddToQueueForm";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FinishGameModal } from "../components/admin/FinishGameModal";
 import { UpNextSection } from "../components/admin/UpNextSection";
 import { FormMatchupModal } from "../components/admin/FormMatchupModal";
@@ -20,6 +20,8 @@ import type { Matchup } from "../types";
 import { Button } from "../components/Button";
 import { authApi } from "../services/api";
 import { clearAuth, getUser } from "../services/auth";
+import { AdminHeader } from "../components/admin/AdminHeader";
+import { DashboardOverview } from "../components/admin/DashboardOverview";
 
 const POLL_MS = 5000;
 
@@ -32,6 +34,8 @@ export default function AdminDashboard() {
   const courts = useAsync(courtsApi.list, POLL_MS);
   const queue = useAsync(queueApi.list, POLL_MS);
   const games = useAsync(() => gamesApi.list("playing"), POLL_MS);
+  const players = useAsync(playersApi.list, POLL_MS);
+  const analytics = useAsync(analyticsApi.get, POLL_MS);
   const upNext = useAsync(matchupsApi.list, POLL_MS);
 
   const [approveTarget, setApproveTarget] = useState<QueueEntry | null>(null);
@@ -176,8 +180,8 @@ export default function AdminDashboard() {
     );
   }
 
-  async function handleStartMatchup(matchup: Matchup) {
-    await run(() => matchupsApi.start(matchup.id), "Matchup started.");
+  async function handleStartMatchup(matchup: Matchup, courtId?: number) {
+    await run(() => matchupsApi.start(matchup.id, courtId), "Matchup started.");
   }
 
   async function handleCancelMatchup(matchup: Matchup) {
@@ -194,13 +198,15 @@ export default function AdminDashboard() {
     );
   }
 
-  const refreshError = courts.error ?? queue.error ?? games.error;
+  const refreshError = courts.error ?? queue.error ?? games.error ?? players.error ?? analytics.error;
 
   const refreshAll = () =>
     Promise.all([
       courts.refresh(),
       queue.refresh(),
       games.refresh(),
+      players.refresh(),
+      analytics.refresh(),
       upNext.refresh(),
       pending.refresh(),
     ]);
@@ -220,44 +226,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Pickleball Queue · Admin
-          </h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link
-              to="/admin/rankings"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              View Rankings
-            </Link>
-            <Link
-              to="/admin/history"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              History
-            </Link>
-            <Link
-              to="/admin/analytics"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              Analytics
-            </Link>
-            <span className="text-xs text-slate-500">
-              Auto-refreshes every 5s
-            </span>
-            {staff && (
-              <span className="text-xs font-medium text-slate-600">
-                {staff.name}
-              </span>
-            )}
-            <Button size="sm" variant="secondary" onClick={logout}>
-              Log out
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader
+        active="dashboard"
+        staffName={staff?.name}
+        activeMatches={games.data?.length ?? 0}
+        syncIntervalSeconds={5}
+        onLogout={logout}
+      />
 
       <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
         {notice && !assign && (
@@ -269,34 +244,33 @@ export default function AdminDashboard() {
           <Alert type="error">Couldn't refresh: {refreshError}</Alert>
         )}
 
-        <CourtsSection
-          courts={courts.data}
-          loading={courts.loading}
-          busy={busy}
-          canAssign={canAssign}
-          onAssign={openAssign}
-          onSetStatus={(court: Court, status) =>
-            run(
-              () => courtsApi.setStatus(court.id, status),
-              status === "maintenance"
-                ? `${court.name} is on maintenance.`
-                : `${court.name} is available.`,
-            )
-          }
-          onAddCourt={(name) =>
-            run(() => courtsApi.create(name), `${name} added.`)
-          }
-        />
+        <div>
+          <h1 className="mb-4 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Dashboard</h1>
+          <DashboardOverview
+            players={players.data?.length ?? null}
+            waiting={queue.data?.filter((entry) => entry.status === "waiting" || entry.status === "called").length ?? null}
+            activeGames={games.data?.length ?? null}
+            availableCourts={courts.data?.filter((court) => court.status === "available").length ?? null}
+            maintenanceCourts={courts.data?.filter((court) => court.status === "maintenance").length ?? null}
+            completedGames={analytics.data?.total_games ?? null}
+            loading={players.loading || analytics.loading || courts.loading || queue.loading || games.loading}
+          />
+        </div>
+
         {pending.data && pending.data.length > 0 && (
-          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
-            <p className="mb-2 text-sm font-semibold text-amber-900">
-              Pending Approvals ({pending.data.length})
-            </p>
-            <ul className="space-y-2">
+          <div className="rounded-2xl border border-amber-300 bg-amber-50/70 p-4 sm:p-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-amber-500 text-xs font-bold text-white">{pending.data.length}</span>
+                <h2 className="text-sm font-extrabold text-amber-950">Walk-in registrations awaiting approval</h2>
+              </div>
+              <p className="text-xs text-amber-800">Review possible returning members before approving.</p>
+            </div>
+            <ul className="grid gap-2 sm:grid-cols-2">
               {pending.data.map((entry) => (
                 <li
                   key={entry.id}
-                  className="rounded-lg bg-white px-3 py-2 text-sm"
+                  className="rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm shadow-sm"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span>
@@ -376,6 +350,28 @@ export default function AdminDashboard() {
             </ul>
           </div>
         )}
+        <CourtsSection
+          courts={courts.data}
+          loading={courts.loading}
+          busy={busy}
+          canAssign={canAssign}
+          nextMatchup={upNext.data?.[0] ?? null}
+          onAssign={openAssign}
+          onStartUpNext={(matchup, courtId) => handleStartMatchup(matchup, courtId)}
+          onFinishGame={setFinishTarget}
+          onSetStatus={(court: Court, status) =>
+            run(
+              () => courtsApi.setStatus(court.id, status),
+              status === "maintenance"
+                ? `${court.name} is on maintenance.`
+                : `${court.name} is available.`,
+            )
+          }
+          onAddCourt={(name) =>
+            run(() => courtsApi.create(name), `${name} added.`)
+          }
+        />
+
         {qrFor && qrFor.qr_token && (
           <PlayerQrCode
             playerName={qrFor.name}
@@ -383,6 +379,14 @@ export default function AdminDashboard() {
             onClose={() => setQrFor(null)}
           />
         )}
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5" aria-labelledby="register-player-heading">
+          <div className="mb-3">
+            <h2 id="register-player-heading" className="text-base font-extrabold text-slate-950">Register &amp; Check Player Into Queue</h2>
+            <p className="mt-1 text-xs text-slate-500">Add a walk-in guest or find a returning player before joining the line.</p>
+          </div>
+          <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
+        </section>
+
         <UpNextSection
           matchups={upNext.data}
           loading={upNext.loading}
@@ -393,13 +397,6 @@ export default function AdminDashboard() {
           onStart={handleStartMatchup}
           onCancel={handleCancelMatchup}
         />
-
-        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-          <p className="mb-2 text-sm font-semibold text-slate-700">
-            Register &amp; Add to Queue
-          </p>
-          <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
-        </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <QueueSection
             entries={queue.data}

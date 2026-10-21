@@ -4,6 +4,7 @@ import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
 import { StatusBadge } from "../StatusBadge";
+import { getCourtTeams } from "../../lib/courtDisplay";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -37,7 +38,10 @@ function TimeRemaining({ endsAt }: { endsAt: string }) {
 
 export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
   return (
-    <Section title="Active Games">
+    <Section
+      title="Active Matches Roster"
+      action={games && <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{games.length} playing</span>}
+    >
       {loading && !games ? (
         <Spinner />
       ) : !games || games.length === 0 ? (
@@ -46,62 +50,36 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
           hint="Assign 4 players to an available court to start one."
         />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="py-2 pr-3">Game #</th>
-                <th className="py-2 pr-3">Court</th>
-                <th className="py-2 pr-3">Players</th>
-                <th className="py-2 pr-3">Started At</th>
-                <th className="py-2 pr-3">Status</th>
-                <th className="py-2 pr-3">Time</th>
-                <th className="py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {games.map((game) => (
-                <tr key={game.id} className="transition-colors hover:bg-sky-50/50">
-                  <td className="py-3 pr-3 font-semibold">
-                    #{game.id}
-                    {game.skill_warning && (
-                      <span
-                        title={game.skill_warning}
-                        className="ml-1 cursor-help"
-                      >
-                        ⚠️
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 pr-3">{game.court?.name ?? "—"}</td>
-                  <td className="py-3 pr-3">
-                    {game.players?.map((p) => p.name).join(", ") ?? "—"}
-                  </td>
-                  <td className="py-3 pr-3">{formatTime(game.started_at)}</td>
-                  <td className="py-3 pr-3">
+        <div className="grid gap-3">
+          {games.map((game) => {
+            const { teamA, teamB } = getCourtTeams(game);
+            return (
+              <article key={game.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 transition-colors hover:border-sky-200">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900">{game.court?.name ?? `Game #${game.id}`}</h3>
+                    <span className="text-xs text-slate-500">#{game.id}</span>
                     <StatusBadge status={game.status} />
-                  </td>
-                  <td className="py-3 pr-3">
-                    {game.ends_at ? (
-                      <TimeRemaining endsAt={game.ends_at} />
-                    ) : (
-                      <span className="text-slate-400">No limit</span>
-                    )}
-                  </td>
-                  <td className="py-3 text-right">
-                    <Button
-                      size="sm"
-                      variant="success"
-                      disabled={busy}
-                      onClick={() => onFinish(game)}
-                    >
-                      Game Finished
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    {game.ends_at ? <TimeRemaining endsAt={game.ends_at} /> : <span className="text-slate-500">Started {formatTime(game.started_at)}</span>}
+                    <Button size="sm" variant="success" disabled={busy} onClick={() => onFinish(game)}>Finish match</Button>
+                  </div>
+                </div>
+                {game.skill_warning && <p className="mt-2 text-xs text-amber-700" title={game.skill_warning}>Player level note: {game.skill_warning}</p>}
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-lg border border-sky-200 bg-white px-3 py-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-sky-700">Team A</p>
+                    <p className="mt-1 text-xs font-medium text-slate-800">{teamA.map((player) => player.name).join(" & ") || "Player details unavailable"}</p>
+                  </div>
+                  <div className="rounded-lg border border-amber-200 bg-white px-3 py-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-amber-700">Team B</p>
+                    <p className="mt-1 text-xs font-medium text-slate-800">{teamB.map((player) => player.name).join(" & ") || "Player details unavailable"}</p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </Section>

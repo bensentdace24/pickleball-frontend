@@ -36,6 +36,32 @@ export interface Court {
   active_game: Game | null;
 }
 
+export interface CourtDisplayPlayer {
+  id: number;
+  name: string;
+  skill_level?: SkillLevel | null;
+}
+
+export interface CourtDisplayGame {
+  id: number;
+  status: GameStatus;
+  started_at: string | null;
+  completed_at?: string | null;
+  duration_minutes: number | null;
+  ends_at: string | null;
+  players?: CourtDisplayPlayer[];
+  team_a?: { players: CourtDisplayPlayer[]; points?: number | null; result?: string | null };
+  team_b?: { players: CourtDisplayPlayer[]; points?: number | null; result?: string | null };
+  skill_warning?: string | null;
+}
+
+export interface CourtActivity {
+  id: number;
+  name: string;
+  status: "playing";
+  active_game: CourtDisplayGame;
+}
+
 export interface QueueEntry {
   id: number;
   queue_number: number;
@@ -168,6 +194,7 @@ export interface PlayerStatusResponse {
   stats: PlayerStats & { avg_seconds: number | null };
   recent_games: RecentGame[];
   rank: RankInfo; // NEW (no question mark, the backend always sends it)
+  active_courts: CourtActivity[];
 }
 
 // recent games

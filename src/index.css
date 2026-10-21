@@ -66,6 +66,13 @@ textarea {
 
 .mini-court--interactive { cursor: pointer; }
 .mini-court--interactive:hover { border-color: #38bdf8; }
+.mini-court--aimable { cursor: crosshair; }
+
+.court-live-dot { display: inline-block; width: 0.5rem; height: 0.5rem; flex: none; border-radius: 999px; background: #94a3b8; }
+.court-live-dot--available { background: #10b981; }
+.court-live-dot--playing { background: #0ea5e9; box-shadow: 0 0 0 3px rgb(14 165 233 / 14%); animation: court-live-pulse 1.8s ease-out infinite; }
+.court-live-dot--maintenance { background: #f59e0b; }
+@keyframes court-live-pulse { 0%, 100% { box-shadow: 0 0 0 3px rgb(14 165 233 / 14%); } 50% { box-shadow: 0 0 0 6px rgb(14 165 233 / 7%); } }
 
 .court-admin-card {
   overflow: hidden;
@@ -87,19 +94,13 @@ textarea {
 .mini-court-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.7rem; }
 .mini-court-card__name { margin: 0; color: #0f172a; font-size: 0.9rem; font-weight: 750; }
 .mini-court-card__format, .mini-court-card__duration { margin: 0.18rem 0 0; color: #64748b; font-size: 0.7rem; }
+.mini-court-card__game-tag { flex: none; border: 1px solid #fde68a; border-radius: 0.4rem; background: #fffbeb; padding: 0.2rem 0.4rem; color: #92400e; font-size: 0.62rem; font-weight: 750; white-space: nowrap; }
 .mini-court-card__players { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-top: 0.65rem; color: #0f172a; font-size: 0.74rem; font-weight: 700; }
 .mini-court-card__players > span:first-child, .mini-court-card__players > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mini-court-card__versus { flex: none; border-radius: 0.35rem; background: #eaf0f6; padding: 0.16rem 0.35rem; color: #64748b; font-size: 0.6rem; }
 .mini-court-card__message { margin: 0.6rem 0 0; color: #64748b; font-size: 0.74rem; }
 .mini-court-card__duration { margin-top: 0.4rem; }
 .mini-court--compact .mini-court__diagram { max-height: 150px; }
-
-@keyframes mini-court-rally {
-  0%, 100% { transform: translateX(-45px) translateY(-10px); }
-  50% { transform: translateX(45px) translateY(9px); }
-}
-
-.mini-court__ball-motion { transform-box: fill-box; transform-origin: center; animation: mini-court-rally 1.7s ease-in-out infinite; }
 
 .mini-court__diagram {
   display: block;

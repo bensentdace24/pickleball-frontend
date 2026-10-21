@@ -1,19 +1,19 @@
-import type { Player } from "../types";
+import type { CourtDisplayPlayer } from "../types";
 
 interface TeamSource {
-  players?: Player[];
+  players?: CourtDisplayPlayer[];
 }
 
 interface GameSource {
   team_a?: TeamSource;
   team_b?: TeamSource;
-  players?: Player[];
+  players?: CourtDisplayPlayer[];
 }
 
 export interface CourtTeams {
-  teamA: Player[];
-  teamB: Player[];
-  allPlayers: Player[];
+  teamA: CourtDisplayPlayer[];
+  teamB: CourtDisplayPlayer[];
+  allPlayers: CourtDisplayPlayer[];
   format: "Singles" | "Doubles" | null;
 }
 

@@ -121,8 +121,10 @@ export const matchupsApi = {
         duration_minutes: durationMinutes,
       }),
     ),
-  start: (matchupId: number) =>
-    unwrap<Game>(http.post(`/matchups/${matchupId}/start`, {})),
+  start: (matchupId: number, courtId?: number) =>
+    unwrap<Game>(
+      http.post(`/matchups/${matchupId}/start`, courtId ? { court_id: courtId } : {}),
+    ),
 
   cancel: (matchupId: number) =>
     unwrap<Matchup>(http.post(`/matchups/${matchupId}/cancel`)),

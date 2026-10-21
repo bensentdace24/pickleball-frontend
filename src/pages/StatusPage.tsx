@@ -55,7 +55,7 @@ export default function StatusPage() {
     );
   if (!data) return null;
 
-  const { player, queue, matchup, stats, recent_games, rank } = data;
+  const { player, queue, matchup, stats, recent_games, rank, active_courts } = data;
   const gameTeamA = queue?.game?.team_a?.players ?? [];
   const gameTeamB = queue?.game?.team_b?.players ?? [];
   const playerIsOnTeamA = gameTeamA.some((teamPlayer) => teamPlayer.id === player.id);
@@ -127,15 +127,6 @@ export default function StatusPage() {
                     {queue.status === "completed" ? "Played on" : "Playing on"}{" "}
                     {queue.game.court?.name}
                   </p>
-                  {queue.status === "playing" && queue.game.court && (
-                    <div className="mt-3">
-                      <MiniCourt
-                        mode="player"
-                        compact
-                        court={{ ...queue.game.court, status: "playing", active_game: queue.game }}
-                      />
-                    </div>
-                  )}
                   {opposingTeam.length > 0 ? (
                     <div className="mt-2 grid gap-1 text-xs text-blue-800 sm:grid-cols-2">
                       <p><span className="font-semibold">With:</span> {ownTeam.map((p) => p.name).join(" · ") || player.name}</p>
@@ -294,6 +285,31 @@ export default function StatusPage() {
           )}
         </div>
         </div>
+
+        <section className="mt-6" aria-labelledby="live-courts-heading">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-sky-700">Around the club</p>
+              <h2 id="live-courts-heading" className="mt-1 text-lg font-bold text-slate-950">Live courts</h2>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800">
+              <span className="court-live-dot court-live-dot--playing" />
+              {active_courts.length} {active_courts.length === 1 ? "match" : "matches"} in play
+            </span>
+          </div>
+          {active_courts.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {active_courts.map((court) => (
+                <MiniCourt key={court.id} court={court} mode="player" />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 px-5 py-8 text-center">
+              <p className="text-sm font-semibold text-slate-700">No matches are on court right now</p>
+              <p className="mt-1 text-xs text-slate-500">Active courts will appear here automatically when play begins.</p>
+            </div>
+          )}
+        </section>
       </div>
       <ConfirmDialog
         open={confirmOpen}
