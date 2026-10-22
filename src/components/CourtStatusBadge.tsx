@@ -1,36 +1,34 @@
 import type { CourtStatus } from "../types";
 
-const statusMeta: Record<
+const config: Record<
   CourtStatus,
-  { label: string; dotClass: string; className: string }
+  { label: string; dot: string; pill: string }
 > = {
-  available: {
-    label: "Available",
-    dotClass: "bg-emerald-500",
-    className: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  },
   playing: {
-    label: "In play",
-    dotClass: "bg-sky-500 animate-pulse",
-    className: "border-sky-200 bg-sky-50 text-sky-800",
+    label: "Live",
+    dot: "bg-lemon-400",
+    pill: "border-lemon-400/35 bg-lemon-400/[0.08] text-lemon-300",
+  },
+  available: {
+    label: "Open",
+    dot: "bg-lime-400",
+    pill: "border-lime-400/35 bg-lime-400/[0.08] text-lime-300",
   },
   maintenance: {
-    label: "Maintenance",
-    dotClass: "bg-amber-500",
-    className: "border-amber-200 bg-amber-50 text-amber-800",
+    label: "Maint.",
+    dot: "bg-amber-400",
+    pill: "border-amber-400/35 bg-amber-400/[0.08] text-amber-300",
   },
 };
 
 export function CourtStatusBadge({ status }: { status: CourtStatus }) {
-  const meta = statusMeta[status];
+  const c = config[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${meta.className}`}
-      aria-label={`Court status: ${meta.label}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider ${c.pill}`}
     >
-      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${meta.dotClass}`}>
-      </span>
-      {meta.label}
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
+      {c.label}
     </span>
   );
 }

@@ -16,9 +16,9 @@ function duration(start: string | null, end: string | null) {
 function Team({ team }: { team?: TeamResult }) {
   const won = team?.result === "win";
   return (
-    <div className={won ? "font-semibold text-green-700" : "text-slate-700"}>
+    <div className={won ? "font-semibold text-lime-400" : "text-cream-100"}>
       {team?.players?.map((p) => p.name).join(", ") || "—"}
-      <span className="ml-2 text-slate-900">{team?.points ?? "-"}</span>
+      <span className="ml-2 text-cream-50">{team?.points ?? "-"}</span>
       {won && <span className="ml-1 text-xs">(win)</span>}
     </div>
   );
@@ -45,25 +45,25 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-ink-950 text-cream-50">
       <AdminHeader active="history" />
 
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="mb-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Past play</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Match history</h1>
-          <p className="mt-1 text-sm text-slate-500">Search completed games by player.</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-400">Past play</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-cream-50 sm:text-3xl">Match history</h1>
+          <p className="mt-1 text-sm text-cream-200">Search completed games by player.</p>
         </div>
         <form onSubmit={submit} className="mb-4 flex gap-2">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by player name"
-            className="w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="w-full max-w-xs rounded-lg border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-cream-50 placeholder:text-mist-400 focus:border-lemon-400 focus:outline-none"
           />
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white"
+            className="rounded-lg bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-950 transition-colors hover:bg-lemon-300"
           >
             Search
           </button>
@@ -74,15 +74,15 @@ export default function HistoryPage() {
                 setSearch("");
                 setApplied("");
               }}
-              className="text-sm text-slate-600 underline"
+              className="text-sm text-cream-200 underline underline-offset-4 hover:text-cream-50"
             >
               Clear
             </button>
           )}
         </form>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="rounded-2xl border border-ink-600 bg-ink-800 p-4 shadow-sm sm:p-5">
+          {error && <p className="text-sm text-rose-400">{error}</p>}
           {loading && !data ? (
             <Spinner />
           ) : !data || data.length === 0 ? (
@@ -97,7 +97,7 @@ export default function HistoryPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] text-left text-sm">
-                <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
+                <thead className="border-b border-ink-600 text-xs uppercase text-cream-200">
                   <tr>
                     <th className="py-2 pr-3">Game</th>
                     <th className="py-2 pr-3">Finished</th>
@@ -107,10 +107,10 @@ export default function HistoryPage() {
                     <th className="py-2 pr-3">Duration</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-ink-600">
                   {data.map((g) => (
-                    <tr key={g.id}>
-                      <td className="py-3 pr-3 font-semibold">#{g.id}</td>
+                    <tr key={g.id} className="text-cream-100 transition-colors hover:bg-ink-700/60">
+                      <td className="py-3 pr-3 font-semibold text-cream-50">#{g.id}</td>
                       <td className="py-3 pr-3">
                         {g.completed_at
                           ? new Date(g.completed_at).toLocaleString()

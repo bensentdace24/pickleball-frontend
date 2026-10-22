@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "./styles/palette.css"; /* ← add this line, right below Tailwind */
+
+/* ...rest of your existing rules (mini-court, etc.) */
+
+/* src/styles/palette.css — import after tailwindcss */
+@theme {
+  /* Base surfaces — warm near-black, not pure black */
+  --color-ink-950: #080b13; /* page background */
+  --color-ink-900: #0d1220; /* app shell */
+  --color-ink-800: #141a2b; /* card surface */
+  --color-ink-700: #1c2438; /* raised surface (inputs, chips) */
+  --color-ink-600: #283044; /* borders */
+  --color-ink-500: #3a435a; /* dividers */
+
+  /* Text — warm off-white, not pure white */
+  --color-cream-50: #f6f2e6;
+  --color-cream-100: #e9e3d3;
+  --color-cream-200: #cfc7b3;
+
+  /* Muted text — warm gray, not slate */
+  --color-mist-400: #8b8b93;
+  --color-mist-500: #6b6b75;
+  --color-mist-600: #4d4d58;
+
+  /* Accents — yellow is primary, the others are status only */
+  --color-lemon-300: #fde047;
+  --color-lemon-400: #facc15; /* primary accent */
+  --color-lemon-500: #eab308; /* pressed */
+  --color-lemon-600: #a16207; /* accent border on dark */
+
+  --color-lime-400: #a3e635; /* "available / open" */
+  --color-sky-400: #38bdf8; /* "info / possible match" */
+  --color-amber-400: #fbbf24; /* "warning / pending" */
+  --color-rose-400: #fb7185; /* "error / danger" */
+}
+
+html,
+body {
+  background: var(--color-ink-950);
+  color: var(--color-cream-50);
+}
+
+/* Kill every stray white bg from old code in one shot. If you want
+   something to be light, use `bg-ink-700`, never `bg-white`. */
+* {
+  border-color: var(--color-ink-600);
+}
+
+/* Optional: tinted scrollbar so it doesn't glare */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-950);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-600);
+  border-radius: 999px;
+  border: 2px solid var(--color-ink-950);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-500);
+}

@@ -32,81 +32,119 @@ export function CourtsSection({
   onAddCourt,
 }: Props) {
   const [name, setName] = useState("");
+  const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState<"all" | CourtStatus>("all");
   const courtList = courts ?? [];
+
   const counts = {
     all: courtList.length,
-    playing: courtList.filter((court) => court.status === "playing").length,
-    available: courtList.filter((court) => court.status === "available").length,
-    maintenance: courtList.filter((court) => court.status === "maintenance").length,
+    playing: courtList.filter((c) => c.status === "playing").length,
+    available: courtList.filter((c) => c.status === "available").length,
+    maintenance: courtList.filter((c) => c.status === "maintenance").length,
   };
-  const visibleCourts = filter === "all" ? courtList : courtList.filter((court) => court.status === filter);
+  const visibleCourts =
+    filter === "all" ? courtList : courtList.filter((c) => c.status === filter);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    if (await onAddCourt(name.trim())) setName("");
+    if (await onAddCourt(name.trim())) {
+      setName("");
+      setAdding(false);
+    }
   }
 
-  const addForm = (
-    <form onSubmit={submit} className="flex gap-2">
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="New court name"
-        maxLength={100}
-        className="w-40 rounded-lg border border-slate-300 px-3 py-1.5 text-sm sm:w-48"
-      />
-      <Button type="submit" size="sm" disabled={busy || !name.trim()}>
-        Add court
-      </Button>
-    </form>
-  );
-
   return (
-    <Section title="Live Court Telemetry & Rally View" action={addForm}>
-      <p className="mb-4 -mt-2 text-sm text-slate-500">Current court status and player positions. Rally movement is a visual simulation.</p>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1" aria-label="Filter courts">
-          {([
-            ["all", `All (${counts.all})`],
-            ["playing", `Live (${counts.playing})`],
-            ["available", `Open (${counts.available})`],
-            ["maintenance", `Maint. (${counts.maintenance})`],
-          ] as const).map(([value, label]) => (
+    <Section
+      title="Courts"
+      action={
+        adding ? (
+          <form onSubmit={submit} className="flex gap-2">
+            <input
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Escape" && setAdding(false)}
+              placeholder="Court name"
+              maxLength={100}
+              className="w-36 rounded-lg border border-slate-700 bg-[#0a1220] px-3 py-1.5 text-sm text-[#f4f1e8] placeholder:text-slate-600 focus:border-amber-400 focus:outline-none sm:w-44"
+            />
+            <Button type="submit" size="sm" disabled={busy || !name.trim()}>
+              Add
+            </Button>
+          </form>
+        ) : (
+          <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
+            + Court
+          </Button>
+        )
+      }
+    >
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div
+          className="flex flex-wrap gap-0.5 rounded-xl border border-slate-800 bg-[#0a1220] p-1"
+          aria-label="Filter courts"
+        >
+          {(
+            [
+              ["all", "All", counts.all],
+              ["playing", "Live", counts.playing],
+              ["available", "Open", counts.available],
+              ["maintenance", "Maint.", counts.maintenance],
+            ] as const
+          ).map(([value, label, count]) => (
             <button
               key={value}
               type="button"
               aria-pressed={filter === value}
               onClick={() => setFilter(value)}
-              className={`rounded-lg px-3 py-2 text-xs font-bold transition ${filter === value ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-white hover:text-slate-900"}`}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                filter === value
+                  ? "bg-amber-400 text-[#0a0f1a]"
+                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+              }`}
             >
               {label}
+              <span
+                className={`tabular-nums text-[0.65rem] ${
+                  filter === value ? "text-[#0a0f1a]/60" : "text-slate-600"
+                }`}
+              >
+                {count}
+              </span>
             </button>
           ))}
         </div>
-        <div className="hidden flex-wrap gap-2 sm:flex" aria-label="Court status legend">
+        <div className="hidden items-center gap-2 sm:flex">
           {(["playing", "available", "maintenance"] as const).map((status) => (
             <CourtStatusBadge key={status} status={status} />
           ))}
         </div>
       </div>
+
       {loading && !courts ? (
         <Spinner />
       ) : courtList.length === 0 ? (
         <EmptyState title="No courts yet" hint="Add your first court above." />
+      ) : visibleCourts.length === 0 ? (
+        <EmptyState
+          title="No courts match this filter"
+          hint="Choose a different status."
+        />
       ) : (
-        visibleCourts.length === 0 ? (
-          <EmptyState title="No courts match this filter" hint="Choose a different court status." />
-        ) : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleCourts.map((court) => (
             <div key={court.id} className="court-admin-card">
               <MiniCourt
                 court={court}
                 mode="admin"
-                onCourtClick={court.status === "available" && canAssign && !busy ? () => onAssign(court.id) : undefined}
+                onCourtClick={
+                  court.status === "available" && canAssign && !busy
+                    ? () => onAssign(court.id)
+                    : undefined
+                }
               />
-              <div className="mt-auto flex flex-wrap gap-2 p-4 pt-0">
+              <div className="flex flex-wrap gap-2 p-3 pt-0">
                 {court.status === "available" && (
                   <>
                     <Button
@@ -114,11 +152,16 @@ export function CourtsSection({
                       disabled={busy || !canAssign}
                       onClick={() => onAssign(court.id)}
                     >
-                      Assign queue
+                      Assign
                     </Button>
                     {nextMatchup && (
-                      <Button size="sm" variant="success" disabled={busy} onClick={() => onStartUpNext(nextMatchup, court.id)}>
-                        Start Up-Next
+                      <Button
+                        size="sm"
+                        variant="success"
+                        disabled={busy}
+                        onClick={() => onStartUpNext(nextMatchup, court.id)}
+                      >
+                        Up-Next
                       </Button>
                     )}
                     <Button
@@ -138,13 +181,24 @@ export function CourtsSection({
                     disabled={busy}
                     onClick={() => onSetStatus(court, "available")}
                   >
-                    Make available
+                    Available
                   </Button>
                 )}
                 {court.status === "playing" && (
                   <>
-                    <p className="mr-auto self-center text-xs text-slate-500">Match in progress</p>
-                    {court.active_game && <Button size="sm" variant="success" disabled={busy} onClick={() => onFinishGame(court.active_game!)}>Finish match</Button>}
+                    <span className="mr-auto self-center text-xs text-slate-500">
+                      In progress
+                    </span>
+                    {court.active_game && (
+                      <Button
+                        size="sm"
+                        variant="success"
+                        disabled={busy}
+                        onClick={() => onFinishGame(court.active_game!)}
+                      >
+                        Finish
+                      </Button>
+                    )}
                   </>
                 )}
               </div>

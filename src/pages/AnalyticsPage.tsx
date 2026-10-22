@@ -11,10 +11,10 @@ function mins(seconds: number | null) {
 
 function StatCard({ label, value, note }: { label: string; value: string | number; note: string }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{label}</p>
-      <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{value}</p>
-      <p className="mt-1 text-xs text-slate-400">{note}</p>
+    <article className="rounded-2xl border border-ink-600 bg-ink-800 p-4 shadow-sm sm:p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream-200">{label}</p>
+      <p className="mt-2 text-3xl font-bold tracking-tight text-cream-50">{value}</p>
+      <p className="mt-1 text-xs text-mist-400">{note}</p>
     </article>
   );
 }
@@ -28,11 +28,11 @@ export default function AnalyticsPage() {
 
       <main className="mx-auto flex max-w-7xl flex-col gap-5 py-6 sm:py-8">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Club insights</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Analytics</h1>
-          <p className="mt-1 text-sm text-slate-500">Match results and participation from completed games.</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-400">Club insights</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-cream-50 sm:text-3xl">Analytics</h1>
+          <p className="mt-1 text-sm text-cream-200">Match results and participation from completed games.</p>
         </div>
-        {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">Couldn't refresh analytics: {error}</div>}
+        {error && <div className="rounded-xl border border-rose-400/35 bg-rose-400/[0.06] px-4 py-3 text-sm text-rose-300">Couldn't refresh analytics: {error}</div>}
         {loading && !data ? (
           <Spinner label="Loading club analytics…" />
         ) : !data ? (
@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
                       { label: "Singles", value: data.singles_games },
                       { label: "Doubles", value: data.doubles_games },
                     ]}
-                    colors={["bg-emerald-700", "bg-amber-500"]}
+                    colors={["bg-lime-400", "bg-amber-400"]}
                   />
                   <AnalyticsChart
                     title="Score margins"
@@ -68,20 +68,20 @@ export default function AnalyticsPage() {
                       { label: "Moderate · 3–5 points", value: data.scores.moderate },
                       { label: "Wide · 6+ points", value: data.scores.lopsided },
                     ]}
-                    colors={["bg-sky-600", "bg-amber-500", "bg-rose-500"]}
+                    colors={["bg-sky-400", "bg-amber-400", "bg-rose-400"]}
                   />
-                  <div className="lg:col-span-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                    Average final score: <span className="font-semibold text-slate-900">{data.scores.avg_winning ?? "—"} to {data.scores.avg_losing ?? "—"}</span>
+                  <div className="lg:col-span-2 rounded-xl border border-ink-600 bg-ink-800 px-4 py-3 text-sm text-cream-200">
+                    Average final score: <span className="font-semibold text-cream-50">{data.scores.avg_winning ?? "—"} to {data.scores.avg_losing ?? "—"}</span>
                   </div>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <section className="rounded-2xl border border-ink-600 bg-ink-800 p-5 shadow-sm sm:p-6">
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
-                      <h2 className="font-semibold text-slate-950">Match duration</h2>
-                      <p className="mt-1 text-xs text-slate-500">Based on {data.time.counted_games} games between 1 minute and 3 hours.</p>
+                      <h2 className="font-semibold text-cream-50">Match duration</h2>
+                      <p className="mt-1 text-xs text-cream-200">Based on {data.time.counted_games} games between 1 minute and 3 hours.</p>
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800">Observed data</span>
+                    <span className="rounded-full border border-lime-400/30 bg-lime-400/[0.08] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-lime-400">Observed data</span>
                   </div>
                   <div className="mt-5 grid gap-3 sm:grid-cols-3">
                     <StatCard label="Average" value={mins(data.time.avg_seconds)} note="Typical match length" />
@@ -90,30 +90,30 @@ export default function AnalyticsPage() {
                   </div>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <section className="rounded-2xl border border-ink-600 bg-ink-800 p-5 shadow-sm sm:p-6">
                   <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                     <div>
-                      <h2 className="font-semibold text-slate-950">Top players</h2>
-                      <p className="mt-1 text-xs text-slate-500">Ranked from completed match results.</p>
+                      <h2 className="font-semibold text-cream-50">Top players</h2>
+                      <p className="mt-1 text-xs text-cream-200">Ranked from completed match results.</p>
                     </div>
-                    <Link to="/admin/rankings" className="text-xs font-semibold text-emerald-800 hover:underline">Full rankings →</Link>
+                    <Link to="/admin/rankings" className="text-xs font-semibold text-lemon-300 hover:underline">Full rankings →</Link>
                   </div>
                   {data.top_players.length === 0 ? (
                     <EmptyState title="No ranked players yet" />
                   ) : (
                     <ol className="grid gap-2 md:grid-cols-2">
                       {data.top_players.map((player) => (
-                        <li key={player.player_id} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-3 transition hover:bg-emerald-50/70">
+                        <li key={player.player_id} className="flex items-center justify-between gap-3 rounded-xl bg-ink-900 px-3 py-3 transition hover:bg-ink-700">
                           <div className="flex min-w-0 items-center gap-3">
-                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-900 text-xs font-bold text-white">#{player.rank}</span>
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-lime-400/15 text-xs font-bold text-lime-400">#{player.rank}</span>
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-semibold text-slate-900">{player.name}</p>
-                              <p className="text-xs text-slate-500">{player.wins}W · {player.losses}L · {player.draws}D</p>
+                              <p className="truncate text-sm font-semibold text-cream-50">{player.name}</p>
+                              <p className="text-xs text-cream-200">{player.wins}W · {player.losses}L · {player.draws}D</p>
                             </div>
                           </div>
                           <div className="shrink-0 text-right">
-                            <p className="text-sm font-bold text-emerald-900">{player.win_rate}%</p>
-                            <p className="text-[10px] text-slate-500">{player.total_points} pts</p>
+                            <p className="text-sm font-bold text-lime-400">{player.win_rate}%</p>
+                            <p className="text-[10px] text-cream-200">{player.total_points} pts</p>
                           </div>
                         </li>
                       ))}

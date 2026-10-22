@@ -6,7 +6,13 @@ import { QueueSection } from "../components/admin/QueueSection";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Alert } from "../components/Feedback";
 import { useAsync } from "../hooks/useAsync";
-import { analyticsApi, courtsApi, gamesApi, playersApi, queueApi } from "../services/api";
+import {
+  analyticsApi,
+  courtsApi,
+  gamesApi,
+  playersApi,
+  queueApi,
+} from "../services/api";
 import type { Court, Game, QueueEntry } from "../types";
 import { AddToQueueForm } from "../components/admin/AddToQueueForm";
 import { useNavigate } from "react-router-dom";
@@ -39,15 +45,14 @@ export default function AdminDashboard() {
   const upNext = useAsync(matchupsApi.list, POLL_MS);
 
   const [approveTarget, setApproveTarget] = useState<QueueEntry | null>(null);
-
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState(false);
   const [assign, setAssign] = useState<{ courtId: number | null } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<QueueEntry | null>(null);
   const [finishTarget, setFinishTarget] = useState<Game | null>(null);
   const [formMatchup, setFormMatchup] = useState(false);
-
   const [qrFor, setQrFor] = useState<Player | null>(null);
+
   const pending = useAsync(queueApi.pending, POLL_MS);
 
   const availableCourts = (courts.data ?? []).filter(
@@ -144,6 +149,7 @@ export default function AdminDashboard() {
     await refreshAll();
     if (entry.player) setQrFor(entry.player);
   }
+
   async function handleFormMatchup(
     assignments: { queue_id: number; side: 0 | 1 }[],
     durationMinutes?: number,
@@ -161,6 +167,7 @@ export default function AdminDashboard() {
       "Approved — added to the queue.",
     );
   }
+
   function requestApprove(entry: QueueEntry) {
     if (entry.possible_matches && entry.possible_matches.length > 0) {
       setApproveTarget(entry);
@@ -198,7 +205,12 @@ export default function AdminDashboard() {
     );
   }
 
-  const refreshError = courts.error ?? queue.error ?? games.error ?? players.error ?? analytics.error;
+  const refreshError =
+    courts.error ??
+    queue.error ??
+    games.error ??
+    players.error ??
+    analytics.error;
 
   const refreshAll = () =>
     Promise.all([
@@ -218,14 +230,16 @@ export default function AdminDashboard() {
     try {
       await authApi.logout();
     } catch {
-      // the token may already be invalid, so just clear it locally
+      // token may already be invalid, so just clear it locally
     }
     clearAuth();
     navigate("/login", { replace: true });
   }
 
+  const pendingCount = pending.data?.length ?? 0;
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#0a0f1a] text-[#f4f1e8]">
       <AdminHeader
         active="dashboard"
         staffName={staff?.name}
@@ -234,7 +248,7 @@ export default function AdminDashboard() {
         onLogout={logout}
       />
 
-      <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
+      <main className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6">
         {notice && !assign && (
           <Alert type={notice.type} onDismiss={() => setNotice(null)}>
             {notice.text}
@@ -244,43 +258,61 @@ export default function AdminDashboard() {
           <Alert type="error">Couldn't refresh: {refreshError}</Alert>
         )}
 
-        <div>
-          <h1 className="mb-4 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Dashboard</h1>
-          <DashboardOverview
-            players={players.data?.length ?? null}
-            waiting={queue.data?.filter((entry) => entry.status === "waiting" || entry.status === "called").length ?? null}
-            activeGames={games.data?.length ?? null}
-            availableCourts={courts.data?.filter((court) => court.status === "available").length ?? null}
-            maintenanceCourts={courts.data?.filter((court) => court.status === "maintenance").length ?? null}
-            completedGames={analytics.data?.total_games ?? null}
-            loading={players.loading || analytics.loading || courts.loading || queue.loading || games.loading}
-          />
-        </div>
+        {/* Stat strip — the first thing the eye lands on */}
+        <DashboardOverview
+          players={players.data?.length ?? null}
+          waiting={
+            queue.data?.filter(
+              (e) => e.status === "waiting" || e.status === "called",
+            ).length ?? null
+          }
+          activeGames={games.data?.length ?? null}
+          availableCourts={availableCourts.length}
+          maintenanceCourts={
+            courts.data?.filter((c) => c.status === "maintenance").length ??
+            null
+          }
+          completedGames={analytics.data?.total_games ?? null}
+          loading={
+            players.loading ||
+            analytics.loading ||
+            courts.loading ||
+            queue.loading ||
+            games.loading
+          }
+        />
 
-        {pending.data && pending.data.length > 0 && (
-          <div className="rounded-2xl border border-amber-300 bg-amber-50/70 p-4 sm:p-5">
+        {/* Pending approvals — a single compact banner, not a big card */}
+        {pendingCount > 0 && (
+          <section className="rounded-2xl border border-amber-400/25 bg-amber-400/[0.04] p-4 sm:p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-amber-500 text-xs font-bold text-white">{pending.data.length}</span>
-                <h2 className="text-sm font-extrabold text-amber-950">Walk-in registrations awaiting approval</h2>
+              <div className="flex items-center gap-2.5">
+                <span className="grid h-6 min-w-6 place-items-center rounded-full bg-amber-400 px-1.5 text-xs font-extrabold text-[#0a0f1a]">
+                  {pendingCount}
+                </span>
+                <h2 className="text-sm font-extrabold text-amber-100">
+                  Awaiting approval
+                </h2>
               </div>
-              <p className="text-xs text-amber-800">Review possible returning members before approving.</p>
+              <p className="text-xs text-amber-200/60">
+                Check returning members before approving.
+              </p>
             </div>
             <ul className="grid gap-2 sm:grid-cols-2">
-              {pending.data.map((entry) => (
+              {pending.data!.map((entry) => (
                 <li
                   key={entry.id}
-                  className="rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm shadow-sm"
+                  className="rounded-xl border border-amber-400/15 bg-[#0d1524] px-3 py-3 text-sm"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span>
+                    <span className="text-[#f4f1e8]">
                       {entry.player?.name}
                       {entry.player?.phone && (
-                        <span className="ml-2 text-xs text-slate-400">
+                        <span className="ml-2 text-xs text-slate-500">
                           {entry.player.phone}
                         </span>
                       )}
-                      <span className="ml-2 text-xs text-slate-400">
+                      <span className="ml-2 text-xs text-amber-300/70">
                         {entry.match_type === "any"
                           ? "Either"
                           : entry.match_type}
@@ -308,26 +340,28 @@ export default function AdminDashboard() {
 
                   {entry.possible_matches &&
                     entry.possible_matches.length > 0 && (
-                      <div className="mt-2 rounded-md bg-blue-50 px-2 py-2">
-                        <p className="text-xs font-semibold text-blue-900">
-                          Already registered? Possible match:
+                      <div className="mt-2 rounded-lg border border-sky-400/15 bg-sky-400/[0.05] px-2.5 py-2">
+                        <p className="text-[0.68rem] font-bold uppercase tracking-wider text-sky-300">
+                          Possible match
                         </p>
-                        <ul className="mt-1 space-y-1">
+                        <ul className="mt-1.5 space-y-1.5">
                           {entry.possible_matches.map((m) => (
                             <li
                               key={m.id}
-                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-blue-800"
+                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-sky-100/80"
                             >
                               <span>
                                 {m.name}
                                 {m.phone && (
-                                  <span className="ml-1 text-blue-600">
+                                  <span className="ml-1 text-sky-400/70">
                                     ({m.phone})
                                   </span>
                                 )}{" "}
-                                · {m.wins}W-{m.losses}L-{m.draws}D
+                                <span className="text-slate-500">
+                                  {m.wins}W-{m.losses}L-{m.draws}D
+                                </span>
                                 {m.active_status && (
-                                  <span className="ml-1 font-semibold text-red-600">
+                                  <span className="ml-1 font-semibold text-red-400">
                                     · already {m.active_status}
                                   </span>
                                 )}
@@ -348,8 +382,10 @@ export default function AdminDashboard() {
                 </li>
               ))}
             </ul>
-          </div>
+          </section>
         )}
+
+        {/* Courts — the hero of the page */}
         <CourtsSection
           courts={courts.data}
           loading={courts.loading}
@@ -357,7 +393,9 @@ export default function AdminDashboard() {
           canAssign={canAssign}
           nextMatchup={upNext.data?.[0] ?? null}
           onAssign={openAssign}
-          onStartUpNext={(matchup, courtId) => handleStartMatchup(matchup, courtId)}
+          onStartUpNext={(matchup, courtId) =>
+            handleStartMatchup(matchup, courtId)
+          }
           onFinishGame={setFinishTarget}
           onSetStatus={(court: Court, status) =>
             run(
@@ -379,10 +417,20 @@ export default function AdminDashboard() {
             onClose={() => setQrFor(null)}
           />
         )}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5" aria-labelledby="register-player-heading">
-          <div className="mb-3">
-            <h2 id="register-player-heading" className="text-base font-extrabold text-slate-950">Register &amp; Check Player Into Queue</h2>
-            <p className="mt-1 text-xs text-slate-500">Add a walk-in guest or find a returning player before joining the line.</p>
+
+        {/* Register — a compact single row instead of a big bordered section */}
+        <section
+          className="rounded-2xl border border-slate-800 bg-[#0d1524] p-4 sm:p-5"
+          aria-labelledby="register-player-heading"
+        >
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2
+              id="register-player-heading"
+              className="text-sm font-extrabold text-[#f4f1e8]"
+            >
+              Register player
+            </h2>
+            <p className="text-xs text-slate-500">Walk-in or returning</p>
           </div>
           <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
         </section>
@@ -397,7 +445,8 @@ export default function AdminDashboard() {
           onStart={handleStartMatchup}
           onCancel={handleCancelMatchup}
         />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <QueueSection
             entries={queue.data}
             loading={queue.loading}
@@ -457,6 +506,7 @@ export default function AdminDashboard() {
           onClose={() => setFormMatchup(false)}
         />
       )}
+
       <ConfirmDialog
         open={!!approveTarget}
         busy={busy}
