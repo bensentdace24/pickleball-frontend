@@ -96,7 +96,7 @@ export default function AnalyticsPage() {
                       <h2 className="font-semibold text-cream-50">Top players</h2>
                       <p className="mt-1 text-xs text-cream-200">Ranked from completed match results.</p>
                     </div>
-                    <Link to="/admin/rankings" className="text-xs font-semibold text-lemon-300 hover:underline">Full rankings →</Link>
+                    <Link to="/admin/rankings" className="text-xs font-semibold text-lemon-600 hover:underline">Full rankings →</Link>
                   </div>
                   {data.top_players.length === 0 ? (
                     <EmptyState title="No ranked players yet" />

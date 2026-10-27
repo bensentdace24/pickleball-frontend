@@ -1,38 +1,49 @@
-@import "tailwindcss";
-@import "./styles/palette.css"; /* ← add this line, right below Tailwind */
-
-/* ...rest of your existing rules (mini-court, etc.) */
-
-/* src/styles/palette.css — import after tailwindcss */
 @theme {
-  /* Base surfaces — warm near-black, not pure black */
-  --color-ink-950: #080b13; /* page background */
-  --color-ink-900: #0d1220; /* app shell */
-  --color-ink-800: #141a2b; /* card surface */
-  --color-ink-700: #1c2438; /* raised surface (inputs, chips) */
-  --color-ink-600: #283044; /* borders */
-  --color-ink-500: #3a435a; /* dividers */
+  --font-sans: "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
 
-  /* Text — warm off-white, not pure white */
-  --color-cream-50: #f6f2e6;
-  --color-cream-100: #e9e3d3;
-  --color-cream-200: #cfc7b3;
+  /* Pale aqua surfaces, deep teal copy, and the reference's pink accent. */
+  --color-ink-950: #effbfc;
+  --color-ink-900: #e4f8fa;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #f5fcfd;
+  --color-ink-600: #c8e8eb;
+  --color-ink-500: #92cdd2;
 
-  /* Muted text — warm gray, not slate */
-  --color-mist-400: #8b8b93;
-  --color-mist-500: #6b6b75;
-  --color-mist-600: #4d4d58;
+  --color-cream-50: #12343a;
+  --color-cream-100: #244c52;
+  --color-cream-200: #45666c;
+  --color-mist-300: #496b71;
+  --color-mist-400: #56777d;
+  --color-mist-500: #66848a;
+  --color-mist-600: #789398;
 
-  /* Accents — yellow is primary, the others are status only */
-  --color-lemon-300: #fde047;
-  --color-lemon-400: #facc15; /* primary accent */
-  --color-lemon-500: #eab308; /* pressed */
-  --color-lemon-600: #a16207; /* accent border on dark */
+  --color-lemon-300: #f8b5d8;
+  --color-lemon-400: #ed5aa7;
+  --color-lemon-500: #e64b98;
+  --color-lemon-600: #9b1c5d;
+  --color-lemon-950: #33091e;
 
-  --color-lime-400: #a3e635; /* "available / open" */
-  --color-sky-400: #38bdf8; /* "info / possible match" */
-  --color-amber-400: #fbbf24; /* "warning / pending" */
-  --color-rose-400: #fb7185; /* "error / danger" */
+  /* Status text stays dark enough to read on the new light surfaces. */
+  --color-lime-300: #247b43;
+  --color-lime-400: #188345;
+  --color-sky-300: #08717d;
+  --color-sky-400: #0a8795;
+  --color-amber-300: #875000;
+  --color-amber-400: #a65e00;
+  --color-rose-300: #a52242;
+  --color-rose-400: #b42346;
+
+  --color-sky-50: #edfcfd;
+  --color-sky-100: #d3f6f8;
+  --color-sky-200: #a9ebef;
+  --color-sky-500: #0b9eac;
+  --color-sky-600: #087f8b;
+  --color-sky-700: #086a74;
+  --color-sky-800: #10555c;
+  --color-sky-900: #15464b;
+  --color-sky-950: #0c3035;
 }
 
 html,
@@ -41,8 +52,6 @@ body {
   color: var(--color-cream-50);
 }
 
-/* Kill every stray white bg from old code in one shot. If you want
-   something to be light, use `bg-ink-700`, never `bg-white`. */
 * {
   border-color: var(--color-ink-600);
 }

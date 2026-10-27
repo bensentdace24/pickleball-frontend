@@ -239,7 +239,7 @@ export default function AdminDashboard() {
   const pendingCount = pending.data?.length ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#0a0f1a] text-[#f4f1e8]">
+    <div className="min-h-screen bg-ink-950 text-cream-50">
       <AdminHeader
         active="dashboard"
         staffName={staff?.name}
@@ -284,17 +284,17 @@ export default function AdminDashboard() {
 
         {/* Pending approvals — a single compact banner, not a big card */}
         {pendingCount > 0 && (
-          <section className="rounded-2xl border border-amber-400/25 bg-amber-400/[0.04] p-4 sm:p-5">
+          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-6 min-w-6 place-items-center rounded-full bg-amber-400 px-1.5 text-xs font-extrabold text-[#0a0f1a]">
+                <span className="grid h-6 min-w-6 place-items-center rounded-full bg-amber-200 px-1.5 text-xs font-extrabold text-amber-950">
                   {pendingCount}
                 </span>
-                <h2 className="text-sm font-extrabold text-amber-100">
+                <h2 className="text-sm font-extrabold text-amber-950">
                   Awaiting approval
                 </h2>
               </div>
-              <p className="text-xs text-amber-200/60">
+              <p className="text-xs text-amber-900">
                 Check returning members before approving.
               </p>
             </div>
@@ -302,17 +302,17 @@ export default function AdminDashboard() {
               {pending.data!.map((entry) => (
                 <li
                   key={entry.id}
-                  className="rounded-xl border border-amber-400/15 bg-[#0d1524] px-3 py-3 text-sm"
+                  className="rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[#f4f1e8]">
+                    <span className="text-cream-50">
                       {entry.player?.name}
                       {entry.player?.phone && (
                         <span className="ml-2 text-xs text-slate-500">
                           {entry.player.phone}
                         </span>
                       )}
-                      <span className="ml-2 text-xs text-amber-300/70">
+                      <span className="ml-2 text-xs text-amber-900">
                         {entry.match_type === "any"
                           ? "Either"
                           : entry.match_type}
@@ -340,20 +340,20 @@ export default function AdminDashboard() {
 
                   {entry.possible_matches &&
                     entry.possible_matches.length > 0 && (
-                      <div className="mt-2 rounded-lg border border-sky-400/15 bg-sky-400/[0.05] px-2.5 py-2">
-                        <p className="text-[0.68rem] font-bold uppercase tracking-wider text-sky-300">
+                      <div className="mt-2 rounded-lg border border-sky-200 bg-sky-50 px-2.5 py-2">
+                        <p className="text-[0.68rem] font-bold uppercase tracking-wider text-sky-800">
                           Possible match
                         </p>
                         <ul className="mt-1.5 space-y-1.5">
                           {entry.possible_matches.map((m) => (
                             <li
                               key={m.id}
-                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-sky-100/80"
+                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-sky-900"
                             >
                               <span>
                                 {m.name}
                                 {m.phone && (
-                                  <span className="ml-1 text-sky-400/70">
+                                  <span className="ml-1 text-sky-700">
                                     ({m.phone})
                                   </span>
                                 )}{" "}
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                                   {m.wins}W-{m.losses}L-{m.draws}D
                                 </span>
                                 {m.active_status && (
-                                  <span className="ml-1 font-semibold text-red-400">
+                                    <span className="ml-1 font-semibold text-red-700">
                                     · already {m.active_status}
                                   </span>
                                 )}
@@ -420,13 +420,13 @@ export default function AdminDashboard() {
 
         {/* Register — a compact single row instead of a big bordered section */}
         <section
-          className="rounded-2xl border border-slate-800 bg-[#0d1524] p-4 sm:p-5"
+          className="rounded-2xl border border-cyan-100 bg-white p-4 sm:p-5"
           aria-labelledby="register-player-heading"
         >
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2
               id="register-player-heading"
-              className="text-sm font-extrabold text-[#f4f1e8]"
+              className="text-sm font-extrabold text-slate-900"
             >
               Register player
             </h2>

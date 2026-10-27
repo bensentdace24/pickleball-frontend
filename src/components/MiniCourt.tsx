@@ -469,20 +469,20 @@ export function MiniCourt({
                 offset="0"
                 stopColor={
                   court.status === "maintenance"
-                    ? "#334155"
+                    ? "#8b989c"
                     : available
-                      ? "#1e293b"
-                      : "#0f172a"
+                      ? "#d4f6f8"
+                      : "#bceef2"
                 }
               />
               <stop
                 offset="1"
                 stopColor={
                   court.status === "maintenance"
-                    ? "#1e293b"
+                    ? "#77868a"
                     : available
-                      ? "#0f172a"
-                      : "#020617"
+                      ? "#f7d4e7"
+                      : "#f2bada"
                 }
               />
             </linearGradient>
@@ -490,19 +490,31 @@ export function MiniCourt({
               id={`court-floor-${court.id}`}
               x1="0"
               y1="0"
-              x2="0"
-              y2="1"
+              x2="1"
+              y2="0"
             >
               <stop
                 offset="0"
                 stopColor={
-                  court.status === "maintenance" ? "#475569" : "#0e7490"
+                  court.status === "maintenance" ? "#94a3a8" : "#35cbd8"
                 }
               />
               <stop
-                offset="1"
+                offset="50%"
                 stopColor={
-                  court.status === "maintenance" ? "#334155" : "#155e75"
+                  court.status === "maintenance" ? "#77888c" : "#20b9c9"
+                }
+              />
+              <stop
+                offset="50%"
+                stopColor={
+                  court.status === "maintenance" ? "#77888c" : "#f06aae"
+                }
+              />
+              <stop
+                offset="100%"
+                stopColor={
+                  court.status === "maintenance" ? "#66777b" : "#e957a0"
                 }
               />
             </linearGradient>
@@ -512,8 +524,8 @@ export function MiniCourt({
               cy="0.5"
               r="0.5"
             >
-              <stop offset="0" stopColor="#facc15" stopOpacity="0.35" />
-              <stop offset="1" stopColor="#facc15" stopOpacity="0" />
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+              <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
             </radialGradient>
           </defs>
 
@@ -551,8 +563,8 @@ export function MiniCourt({
               court.status === "maintenance"
                 ? "#64748b"
                 : available
-                  ? "#0d9488"
-                  : "#0f766e"
+                  ? "#b9f2f4"
+                  : "#f5c7df"
             }
             fillOpacity="0.65"
           />
@@ -600,30 +612,30 @@ export function MiniCourt({
 
           {available && (
             <g aria-hidden="true">
-              <circle cx="68" cy="78" r="11" fill="#facc15" fillOpacity=".14" />
+              <circle cx="68" cy="78" r="11" fill="#ed5aa7" fillOpacity=".18" />
               <circle
                 cx="68"
                 cy="78"
                 r="5.5"
-                fill="#fde047"
+                fill="#ed5aa7"
                 fillOpacity=".8"
-                stroke="#0a0f1a"
+                stroke="#ffffff"
                 strokeWidth="1.5"
               />
               <circle
                 cx="212"
                 cy="88"
                 r="11"
-                fill="#fde047"
-                fillOpacity=".12"
+                fill="#35cbd8"
+                fillOpacity=".2"
               />
               <circle
                 cx="212"
                 cy="88"
                 r="5.5"
-                fill="#fef9c3"
+                fill="#35cbd8"
                 fillOpacity=".75"
-                stroke="#0a0f1a"
+                stroke="#ffffff"
                 strokeWidth="1.5"
               />
               <ellipse
@@ -631,16 +643,16 @@ export function MiniCourt({
                 cy="88"
                 rx="4.5"
                 ry="2.3"
-                fill="#020617"
-                fillOpacity=".4"
+                fill="#173d42"
+                fillOpacity=".2"
               />
-              <circle cx="140" cy="82" r="7" fill="#fde047" fillOpacity=".28" />
+              <circle cx="140" cy="82" r="7" fill="#ffffff" fillOpacity=".4" />
               <circle
                 cx="140"
                 cy="82"
                 r="3.8"
-                fill="#facc15"
-                stroke="#fef9c3"
+                fill="#ffffff"
+                stroke="#ed5aa7"
                 strokeWidth="1.1"
               />
             </g>

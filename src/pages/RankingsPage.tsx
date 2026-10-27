@@ -182,7 +182,7 @@ export default function RankingsPage() {
                     onClick={() => setSelectedTier(tier)}
                     className={`rounded-lg px-3 py-1.5 transition-all ${
                       selectedTier === tier
-                        ? "bg-ink-700 text-lemon-300 shadow-sm"
+                        ? "bg-ink-700 text-lemon-600 shadow-sm"
                         : "text-cream-200 hover:text-cream-50"
                     }`}
                   >
@@ -280,7 +280,7 @@ export default function RankingsPage() {
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="flex items-center gap-1 text-xs font-semibold text-cream-200 hover:text-lemon-300">
+                          <button className="flex items-center gap-1 text-xs font-semibold text-cream-200 hover:text-lemon-600">
                             <PassIcon />
                             Pass
                           </button>

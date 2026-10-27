@@ -17,8 +17,8 @@ const sizeClass: Record<Size, string> = {
 
 const variantClass: Record<Variant, string> = {
   primary:
-    "bg-lemon-400 text-ink-950 font-extrabold hover:bg-lemon-300 active:bg-lemon-500 " +
-    "shadow-[0_0_0_1px_rgba(250,204,21,.35),0_6px_18px_-8px_rgba(250,204,21,.6)] " +
+    "bg-lemon-400 text-lemon-950 font-extrabold hover:bg-lemon-300 active:bg-lemon-500 " +
+    "shadow-[0_0_0_1px_rgba(237,90,167,.3),0_6px_18px_-8px_rgba(237,90,167,.35)] " +
     "disabled:hover:bg-lemon-400 disabled:shadow-none",
   success:
     "bg-lime-400/15 text-lime-400 font-bold border border-lime-400/35 " +

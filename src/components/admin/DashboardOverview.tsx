@@ -40,14 +40,14 @@ export function DashboardOverview({
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-2xl border border-slate-800 bg-[#0d1524] px-3.5 py-3 transition-colors hover:border-slate-700"
+          className="rounded-2xl border border-cyan-100 bg-white px-3.5 py-3 transition-colors hover:border-cyan-300"
         >
           <div className="flex items-center gap-1.5">
             <span
               className={`overview-dot overview-dot--${stat.accent}`}
               aria-hidden="true"
             />
-            <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
               {stat.label}
             </span>
           </div>
@@ -59,11 +59,11 @@ export function DashboardOverview({
                   ? "text-lime-400"
                   : stat.accent === "warn"
                     ? "text-amber-300"
-                    : "text-[#f4f1e8]"
+                    : "text-slate-900"
             }`}
           >
             {loading && stat.value === null ? (
-              <span className="inline-block h-6 w-8 animate-pulse rounded bg-slate-800" />
+              <span className="inline-block h-6 w-8 animate-pulse rounded bg-cyan-100" />
             ) : (
               (stat.value ?? "—")
             )}

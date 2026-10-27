@@ -45,14 +45,14 @@ export function AdminHeader({
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         {/* Brand + live pill */}
         <div className="flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-lemon-400 text-sm font-black text-ink-950">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-lemon-400 text-sm font-black text-lemon-950">
             P
           </span>
           <span className="hidden text-sm font-extrabold text-cream-50 sm:block">
             Pickleball
           </span>
           {activeMatches !== undefined && (
-            <span className="flex items-center gap-1.5 rounded-full border border-lemon-400/30 bg-lemon-400/[0.08] px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-lemon-300">
+            <span className="flex items-center gap-1.5 rounded-full border border-lemon-400/30 bg-lemon-400/[0.08] px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-lemon-600">
               <span className="h-1.5 w-1.5 rounded-full bg-lemon-400" />
               {activeMatches} live
             </span>
@@ -68,7 +68,7 @@ export function AdminHeader({
               aria-current={active === link.id ? "page" : undefined}
               className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
                 active === link.id
-                  ? "bg-lemon-400/15 text-lemon-300"
+                  ? "bg-lemon-400/15 text-lemon-600"
                   : "text-cream-200/70 hover:bg-ink-800 hover:text-cream-50"
               }`}
             >

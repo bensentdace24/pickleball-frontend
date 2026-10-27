@@ -7,7 +7,7 @@ const config: Record<
   playing: {
     label: "Live",
     dot: "bg-lemon-400",
-    pill: "border-lemon-400/35 bg-lemon-400/[0.08] text-lemon-300",
+    pill: "border-lemon-400/35 bg-lemon-400/[0.08] text-lemon-600",
   },
   available: {
     label: "Open",

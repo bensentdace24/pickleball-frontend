@@ -63,7 +63,7 @@ export default function HistoryPage() {
           />
           <button
             type="submit"
-            className="rounded-lg bg-lemon-400 px-4 py-2 text-sm font-bold text-ink-950 transition-colors hover:bg-lemon-300"
+            className="rounded-lg bg-lemon-400 px-4 py-2 text-sm font-bold text-lemon-950 transition-colors hover:bg-lemon-300"
           >
             Search
           </button>
