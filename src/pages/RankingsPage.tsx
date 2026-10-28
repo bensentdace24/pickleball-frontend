@@ -218,6 +218,7 @@ export default function RankingsPage() {
                     <th className="py-3 px-4">Tier</th>
                     <th className="py-3 px-4">Record</th>
                     <th className="min-w-[140px] py-3 px-4">Win %</th>
+                    <th className="py-3 px-4">Point diff</th>
                     <th className="py-3 px-4">Points</th>
                     <th className="py-3 px-4">Avg Time</th>
                     <th className="py-3 px-4 text-right">Actions</th>
@@ -265,6 +266,10 @@ export default function RankingsPage() {
                             {row.win_rate}%
                           </span>
                         </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-semibold tabular-nums text-cream-100">
+                        {row.point_diff > 0 ? "+" : ""}{row.point_diff}
                       </td>
 
                       {/* Points */}

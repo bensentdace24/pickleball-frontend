@@ -15,6 +15,8 @@ interface MiniCourtProps {
   mode?: "admin" | "player";
   compact?: boolean;
   onCourtClick?: () => void;
+  onScoreChange?: (gameId: number, side: Side, change: -1 | 1) => void;
+  scoreBusy?: boolean;
 }
 
 type Side = 0 | 1;
@@ -32,6 +34,8 @@ export function MiniCourt({
   mode = "admin",
   compact = false,
   onCourtClick,
+  onScoreChange,
+  scoreBusy = false,
 }: MiniCourtProps) {
   const { teamA, teamB, allPlayers, format } = getCourtTeams(court.active_game);
   const playing = court.status === "playing" && allPlayers.length > 0;
@@ -704,6 +708,38 @@ export function MiniCourt({
           {available ? "Ready for the next match" : "Unavailable for matches"}
         </p>
       )}
+      {mode === "admin" && playing && court.active_game && onScoreChange && (
+        <div className="mt-3 grid grid-cols-2 gap-2" aria-label="Match score">
+          {([0, 1] as const).map((side) => {
+            const score = side === 0
+              ? court.active_game?.team_a?.points ?? 0
+              : court.active_game?.team_b?.points ?? 0;
+            const label = side === 0 ? "Team A" : "Team B";
+            return (
+              <div key={side} className="flex items-center justify-between rounded-lg bg-slate-50 px-2 py-1.5">
+                <span className="text-xs font-semibold text-slate-500">{label}</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label={`Remove point from ${label}`}
+                    disabled={scoreBusy || score <= 0}
+                    onClick={() => onScoreChange(court.active_game!.id, side, -1)}
+                    className="h-7 w-7 rounded-md border border-slate-200 bg-white font-bold text-slate-700 disabled:opacity-40"
+                  >−</button>
+                  <span className="min-w-5 text-center font-bold tabular-nums text-slate-900">{score}</span>
+                  <button
+                    type="button"
+                    aria-label={`Add point to ${label}`}
+                    disabled={scoreBusy || score >= 11}
+                    onClick={() => onScoreChange(court.active_game!.id, side, 1)}
+                    className="h-7 w-7 rounded-md border border-slate-200 bg-white font-bold text-slate-700 disabled:opacity-40"
+                  >+</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
       {mode === "admin" && playing && court.active_game?.started_at && (
         <p className="mini-court-card__duration">
           Started{" "}
@@ -786,6 +822,7 @@ interface CourtsSectionProps {
   onFinishGame: (game: Game) => void;
   onSetStatus: (court: Court, status: "available" | "maintenance") => void;
   onAddCourt: (name: string) => Promise<boolean>;
+  onScoreChange: (gameId: number, side: 0 | 1, change: -1 | 1) => void;
 }
 
 export function CourtsSection({
@@ -793,6 +830,8 @@ export function CourtsSection({
   loading,
   canAssign,
   onAssign,
+  onScoreChange,
+  busy,
 }: CourtsSectionProps) {
   return (
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -804,6 +843,8 @@ export function CourtsSection({
             key={court.id}
             court={court}
             onCourtClick={canAssign ? () => onAssign(court.id) : undefined}
+            onScoreChange={onScoreChange}
+            scoreBusy={busy}
           />
         ))
       )}

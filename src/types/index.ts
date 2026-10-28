@@ -50,8 +50,16 @@ export interface CourtDisplayGame {
   duration_minutes: number | null;
   ends_at: string | null;
   players?: CourtDisplayPlayer[];
-  team_a?: { players: CourtDisplayPlayer[]; points?: number | null; result?: string | null };
-  team_b?: { players: CourtDisplayPlayer[]; points?: number | null; result?: string | null };
+  team_a?: {
+    players: CourtDisplayPlayer[];
+    points?: number | null;
+    result?: string | null;
+  };
+  team_b?: {
+    players: CourtDisplayPlayer[];
+    points?: number | null;
+    result?: string | null;
+  };
   skill_warning?: string | null;
 }
 
@@ -107,7 +115,7 @@ export interface CreatePlayerPayload {
 export interface TeamResult {
   players: Player[];
   points: number | null;
-  result: "win" | "loss" | "draw" | null;
+  result: "playing" | "win" | "loss" | "draw" | null;
 }
 
 export interface Game {
@@ -143,6 +151,7 @@ export interface RankingRow {
   win_rate: number;
   top_percent: number;
   avg_seconds: number | null;
+  point_diff: number;
 }
 
 export interface Matchup {

@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                                   {m.wins}W-{m.losses}L-{m.draws}D
                                 </span>
                                 {m.active_status && (
-                                    <span className="ml-1 font-semibold text-red-700">
+                                  <span className="ml-1 font-semibold text-red-700">
                                     · already {m.active_status}
                                   </span>
                                 )}
@@ -397,6 +397,12 @@ export default function AdminDashboard() {
             handleStartMatchup(matchup, courtId)
           }
           onFinishGame={setFinishTarget}
+          onScoreChange={(gameId, side, change) =>
+            run(
+              () => gamesApi.updateScore(gameId, side, change),
+              "Score updated.",
+            )
+          }
           onSetStatus={(court: Court, status) =>
             run(
               () => courtsApi.setStatus(court.id, status),

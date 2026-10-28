@@ -77,6 +77,8 @@ export const gamesApi = {
   ) => unwrap<Game[]>(http.get("/games", { params: { status, ...opts } })),
   assign: (payload: AssignGamePayload) =>
     unwrap<Game>(http.post("/games", payload)),
+  updateScore: (id: number, side: 0 | 1, change: -1 | 1) =>
+    unwrap<Game>(http.post(`/games/${id}/score`, { side, change })),
   finish: (
     id: number,
     teamAScore: number,

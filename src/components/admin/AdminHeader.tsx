@@ -49,7 +49,7 @@ export function AdminHeader({
             P
           </span>
           <span className="hidden text-sm font-extrabold text-cream-50 sm:block">
-            Pickleball
+            MJ Pickle Hub
           </span>
           {activeMatches !== undefined && (
             <span className="flex items-center gap-1.5 rounded-full border border-lemon-400/30 bg-lemon-400/[0.08] px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-lemon-600">

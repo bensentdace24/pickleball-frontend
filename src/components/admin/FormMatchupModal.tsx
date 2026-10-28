@@ -11,7 +11,6 @@ interface Props {
   error: string | null;
   onSubmit: (
     assignments: { queue_id: number; side: 0 | 1 }[],
-    durationMinutes?: number,
   ) => void;
   onClose: () => void;
 }
@@ -24,7 +23,6 @@ export function FormMatchupModal({
   onClose,
 }: Props) {
   const [matchSize, setMatchSize] = useState<2 | 4>(4);
-  const [duration, setDuration] = useState<number | "">("");
   const [sides, setSides] = useState<Record<number, 0 | 1>>({});
 
   const perSide = matchSize / 2;
@@ -59,7 +57,7 @@ export function FormMatchupModal({
       queue_id: id,
       side: sides[id],
     }));
-    onSubmit(assignments, duration || undefined);
+    onSubmit(assignments);
   }
 
   return (
@@ -101,32 +99,6 @@ export function FormMatchupModal({
             >
               Singles (2)
             </button>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-sm font-medium text-slate-700">Time limit</p>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {[
-              { label: "No limit", value: "" as const },
-              { label: "30 min", value: 30 },
-              { label: "1 hr", value: 60 },
-              { label: "1.5 hr", value: 90 },
-              { label: "2 hr", value: 120 },
-            ].map((opt) => (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => setDuration(opt.value)}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
-                  duration === opt.value
-                    ? "border-blue-600 bg-blue-50 text-blue-700"
-                    : "border-slate-300 text-slate-600"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
           </div>
         </div>
 
