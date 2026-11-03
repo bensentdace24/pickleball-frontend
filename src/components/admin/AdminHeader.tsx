@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import { authApi } from "../../services/api";
 import { clearAuth } from "../../services/auth";
+import { Button } from "../Button";
+import { Badge } from "../Badge";
+import { Flex } from "../layout/Page";
 
 interface Props {
   active: "dashboard" | "rankings" | "history" | "analytics";
@@ -41,23 +45,22 @@ export function AdminHeader({
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-ink-600 bg-ink-900/85 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-border bg-surface-elevated/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         {/* Brand + live pill */}
-        <div className="flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-lemon-400 text-sm font-black text-lemon-950">
+        <Flex align="center" gap={3}>
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-600 text-sm font-black text-white">
             P
           </span>
-          <span className="hidden text-sm font-extrabold text-cream-50 sm:block">
+          <span className="hidden text-sm font-bold text-text-primary sm:block">
             MJ Pickle Hub
           </span>
           {activeMatches !== undefined && (
-            <span className="flex items-center gap-1.5 rounded-full border border-lemon-400/30 bg-lemon-400/[0.08] px-2 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-lemon-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-lemon-400" />
+            <Badge variant="playing" dot>
               {activeMatches} live
-            </span>
+            </Badge>
           )}
-        </div>
+        </Flex>
 
         {/* Nav */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
@@ -66,10 +69,10 @@ export function AdminHeader({
               key={link.id}
               href={link.href}
               aria-current={active === link.id ? "page" : undefined}
-              className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                 active === link.id
-                  ? "bg-lemon-400/15 text-lemon-600"
-                  : "text-cream-200/70 hover:bg-ink-800 hover:text-cream-50"
+                  ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
+                  : "text-text-secondary hover:bg-surface-sunken hover:text-text-primary"
               }`}
             >
               {link.label}
@@ -78,26 +81,29 @@ export function AdminHeader({
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <Flex align="center" gap={3}>
           {syncIntervalSeconds !== undefined && (
-            <span className="hidden items-center gap-1.5 text-[0.7rem] text-mist-400 sm:flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-lime-400" />
+            <Flex align="center" gap={1.5} className="hidden text-xs text-text-tertiary sm:flex">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success-500" aria-hidden="true" />
               {syncIntervalSeconds}s
-            </span>
+            </Flex>
           )}
           {staffName && (
-            <span className="hidden max-w-[10ch] truncate text-xs font-semibold text-cream-200 sm:block">
+            <span className="hidden max-w-[10ch] truncate text-xs font-semibold text-text-secondary sm:block">
               {staffName}
             </span>
           )}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<LogOut className="h-4 w-4" />}
+            iconPosition="left"
             onClick={handleLogout}
-            className="rounded-lg border border-ink-600 bg-ink-800 px-3 py-1.5 text-xs font-bold text-cream-200 transition-colors hover:border-rose-400/40 hover:bg-rose-400/[0.08] hover:text-rose-300"
+            className="text-text-secondary hover:text-danger-600 dark:hover:text-danger-400"
           >
             Sign out
-          </button>
-        </div>
+          </Button>
+        </Flex>
       </div>
     </header>
   );

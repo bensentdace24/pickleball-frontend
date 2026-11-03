@@ -4,6 +4,9 @@ import { Button } from "../components/Button";
 import { Alert } from "../components/Feedback";
 import { authApi } from "../services/api";
 import { getToken, saveAuth } from "../services/auth";
+import { Card, Input, Field } from "../components";
+import { Badge } from "../components/Badge";
+import { Page, Container, Flex } from "../components/layout/Page";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -34,54 +37,54 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <form
-        onSubmit={submit}
-        className="w-full max-w-sm rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200"
-      >
-        <h1 className="text-xl font-bold text-slate-900">Staff Login</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Pickleball Queue · front desk
-        </p>
+    <Page withBackground>
+      <Container size="sm" className="py-12">
+        <Flex direction="col" align="center" className="w-full">
+          <Card variant="elevated" className="w-full max-w-sm p-6">
+            <div className="text-center mb-6">
+              <Badge variant="primary" dot className="mb-3 text-xs">
+                Pickleball Queue
+              </Badge>
+              <h1 className="text-xl font-bold text-text-primary">Staff Login</h1>
+              <p className="mt-1 text-sm text-text-secondary">Front desk access</p>
+            </div>
 
-        <label className="mt-5 block text-sm font-medium text-slate-700">
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="username"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-          />
-        </label>
+            <form onSubmit={submit} className="flex flex-col gap-4">
+              <Field label="Email" required>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="username"
+                  required
+                  placeholder="staff@club.com"
+                />
+              </Field>
 
-        <label className="mt-4 block text-sm font-medium text-slate-700">
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-          />
-        </label>
+              <Field label="Password" required>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  placeholder="••••••••"
+                />
+              </Field>
 
-        {error && (
-          <div className="mt-4">
-            <Alert type="error">{error}</Alert>
-          </div>
-        )}
+              {error && <Alert type="error">{error}</Alert>}
 
-        <Button
-          type="submit"
-          className="mt-5 w-full"
-          disabled={busy || !email || !password}
-        >
-          {busy ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
-    </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={busy || !email || !password}
+              >
+                {busy ? "Signing in…" : "Sign in"}
+              </Button>
+            </form>
+          </Card>
+        </Flex>
+      </Container>
+    </Page>
   );
 }

@@ -28,6 +28,7 @@ import { authApi } from "../services/api";
 import { clearAuth, getUser } from "../services/auth";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { DashboardOverview } from "../components/admin/DashboardOverview";
+import { Page, Container, Section, Flex, Badge } from "../components";
 
 const POLL_MS = 5000;
 
@@ -239,7 +240,7 @@ export default function AdminDashboard() {
   const pendingCount = pending.data?.length ?? 0;
 
   return (
-    <div className="min-h-screen bg-ink-950 text-cream-50">
+    <Page withBackground>
       <AdminHeader
         active="dashboard"
         staffName={staff?.name}
@@ -248,226 +249,209 @@ export default function AdminDashboard() {
         onLogout={logout}
       />
 
-      <main className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6">
-        {notice && !assign && (
-          <Alert type={notice.type} onDismiss={() => setNotice(null)}>
-            {notice.text}
-          </Alert>
-        )}
-        {refreshError && (
-          <Alert type="error">Couldn't refresh: {refreshError}</Alert>
-        )}
+      <main className="mx-auto max-w-7xl px-4 py-6">
+        <Container size="full">
+          {notice && !assign && (
+            <Alert type={notice.type} onDismiss={() => setNotice(null)}>
+              {notice.text}
+            </Alert>
+          )}
+          {refreshError && (
+            <Alert type="error">Couldn't refresh: {refreshError}</Alert>
+          )}
 
-        {/* Stat strip — the first thing the eye lands on */}
-        <DashboardOverview
-          players={players.data?.length ?? null}
-          waiting={
-            queue.data?.filter(
-              (e) => e.status === "waiting" || e.status === "called",
-            ).length ?? null
-          }
-          activeGames={games.data?.length ?? null}
-          availableCourts={availableCourts.length}
-          maintenanceCourts={
-            courts.data?.filter((c) => c.status === "maintenance").length ??
-            null
-          }
-          completedGames={analytics.data?.total_games ?? null}
-          loading={
-            players.loading ||
-            analytics.loading ||
-            courts.loading ||
-            queue.loading ||
-            games.loading
-          }
-        />
-
-        {/* Pending approvals — a single compact banner, not a big card */}
-        {pendingCount > 0 && (
-          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <span className="grid h-6 min-w-6 place-items-center rounded-full bg-amber-200 px-1.5 text-xs font-extrabold text-amber-950">
-                  {pendingCount}
-                </span>
-                <h2 className="text-sm font-extrabold text-amber-950">
-                  Awaiting approval
-                </h2>
-              </div>
-              <p className="text-xs text-amber-900">
-                Check returning members before approving.
-              </p>
-            </div>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {pending.data!.map((entry) => (
-                <li
-                  key={entry.id}
-                  className="rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-cream-50">
-                      {entry.player?.name}
-                      {entry.player?.phone && (
-                        <span className="ml-2 text-xs text-slate-500">
-                          {entry.player.phone}
-                        </span>
-                      )}
-                      <span className="ml-2 text-xs text-amber-900">
-                        {entry.match_type === "any"
-                          ? "Either"
-                          : entry.match_type}
-                      </span>
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="success"
-                        disabled={busy}
-                        onClick={() => requestApprove(entry)}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        disabled={busy}
-                        onClick={() => handleReject(entry.id)}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  </div>
-
-                  {entry.possible_matches &&
-                    entry.possible_matches.length > 0 && (
-                      <div className="mt-2 rounded-lg border border-sky-200 bg-sky-50 px-2.5 py-2">
-                        <p className="text-[0.68rem] font-bold uppercase tracking-wider text-sky-800">
-                          Possible match
-                        </p>
-                        <ul className="mt-1.5 space-y-1.5">
-                          {entry.possible_matches.map((m) => (
-                            <li
-                              key={m.id}
-                              className="flex flex-wrap items-center justify-between gap-2 text-xs text-sky-900"
-                            >
-                              <span>
-                                {m.name}
-                                {m.phone && (
-                                  <span className="ml-1 text-sky-700">
-                                    ({m.phone})
-                                  </span>
-                                )}{" "}
-                                <span className="text-slate-500">
-                                  {m.wins}W-{m.losses}L-{m.draws}D
-                                </span>
-                                {m.active_status && (
-                                  <span className="ml-1 font-semibold text-red-700">
-                                    · already {m.active_status}
-                                  </span>
-                                )}
-                              </span>
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                disabled={busy || !!m.active_status}
-                                onClick={() => handleLink(entry.id, m.id)}
-                              >
-                                Same person
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* Courts — the hero of the page */}
-        <CourtsSection
-          courts={courts.data}
-          loading={courts.loading}
-          busy={busy}
-          canAssign={canAssign}
-          nextMatchup={upNext.data?.[0] ?? null}
-          onAssign={openAssign}
-          onStartUpNext={(matchup, courtId) =>
-            handleStartMatchup(matchup, courtId)
-          }
-          onFinishGame={setFinishTarget}
-          onScoreChange={(gameId, side, change) =>
-            run(
-              () => gamesApi.updateScore(gameId, side, change),
-              "Score updated.",
-            )
-          }
-          onSetStatus={(court: Court, status) =>
-            run(
-              () => courtsApi.setStatus(court.id, status),
-              status === "maintenance"
-                ? `${court.name} is on maintenance.`
-                : `${court.name} is available.`,
-            )
-          }
-          onAddCourt={(name) =>
-            run(() => courtsApi.create(name), `${name} added.`)
-          }
-        />
-
-        {qrFor && qrFor.qr_token && (
-          <PlayerQrCode
-            playerName={qrFor.name}
-            qrToken={qrFor.qr_token}
-            onClose={() => setQrFor(null)}
+          {/* Stat strip — the first thing the eye lands on */}
+          <DashboardOverview
+            players={players.data?.length ?? null}
+            waiting={
+              queue.data?.filter(
+                (e) => e.status === "waiting" || e.status === "called",
+              ).length ?? null
+            }
+            activeGames={games.data?.length ?? null}
+            availableCourts={availableCourts.length}
+            maintenanceCourts={
+              courts.data?.filter((c) => c.status === "maintenance").length ??
+              null
+            }
+            completedGames={analytics.data?.total_games ?? null}
+            loading={
+              players.loading ||
+              analytics.loading ||
+              courts.loading ||
+              queue.loading ||
+              games.loading
+            }
           />
-        )}
 
-        {/* Register — a compact single row instead of a big bordered section */}
-        <section
-          className="rounded-2xl border border-cyan-100 bg-white p-4 sm:p-5"
-          aria-labelledby="register-player-heading"
-        >
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <h2
-              id="register-player-heading"
-              className="text-sm font-extrabold text-slate-900"
+          {/* Pending approvals */}
+          {pendingCount > 0 && (
+            <Section
+              title="Awaiting approval"
+              subtitle="Check returning members before approving."
+              className="border-warning-200 bg-warning-50 dark:border-warning-800 dark:bg-warning-900/20"
             >
-              Register player
-            </h2>
-            <p className="text-xs text-slate-500">Walk-in or returning</p>
-          </div>
-          <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
-        </section>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {pending.data!.map((entry) => (
+                  <li
+                    key={entry.id}
+                    className="rounded-xl border border-warning-200 bg-white p-3 sm:p-4 dark:border-warning-800 dark:bg-neutral-900"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-text-primary">
+                        {entry.player?.name}
+                        {entry.player?.phone && (
+                          <span className="ml-2 text-xs text-text-tertiary">
+                            {entry.player.phone}
+                          </span>
+                        )}
+                        <Badge variant="info" size="sm" className="ml-2">
+                          {entry.match_type === "any" ? "Either" : entry.match_type}
+                        </Badge>
+                      </span>
+                      <Flex gap={2}>
+                        <Button
+                          size="sm"
+                          variant="success"
+                          disabled={busy}
+                          onClick={() => requestApprove(entry)}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={busy}
+                          onClick={() => handleReject(entry.id)}
+                        >
+                          Reject
+                        </Button>
+                      </Flex>
+                    </div>
 
-        <UpNextSection
-          matchups={upNext.data}
-          loading={upNext.loading}
-          busy={busy}
-          canStart={availableCourts.length > 0}
-          onFormMatchup={() => setFormMatchup(true)}
-          onSmartForm={handleSmartForm}
-          onStart={handleStartMatchup}
-          onCancel={handleCancelMatchup}
-        />
+                    {entry.possible_matches &&
+                      entry.possible_matches.length > 0 && (
+                        <div className="mt-2 rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-2 dark:border-primary-800 dark:bg-primary-900/20">
+                          <p className="text-[0.68rem] font-bold uppercase tracking-wider text-primary-700 dark:text-primary-400">
+                            Possible match
+                          </p>
+                          <ul className="mt-1.5 space-y-1.5">
+                            {entry.possible_matches.map((m) => (
+                              <li
+                                key={m.id}
+                                className="flex flex-wrap items-center justify-between gap-2 text-xs text-primary-900 dark:text-primary-300"
+                              >
+                                <span>
+                                  {m.name}
+                                  {m.phone && (
+                                    <span className="ml-1 text-primary-600 dark:text-primary-500">
+                                      ({m.phone})
+                                    </span>
+                                  )}{" "}
+                                  <span className="text-text-tertiary">
+                                    {m.wins}W-{m.losses}L-{m.draws}D
+                                  </span>
+                                  {m.active_status && (
+                                    <span className="ml-1 font-semibold text-danger-600 dark:text-danger-400">
+                                      · already {m.active_status}
+                                    </span>
+                                  )}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  disabled={busy || !!m.active_status}
+                                  onClick={() => handleLink(entry.id, m.id)}
+                                >
+                                  Same person
+                                </Button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <QueueSection
-            entries={queue.data}
-            loading={queue.loading}
+          {/* Courts — the hero of the page */}
+          <CourtsSection
+            courts={courts.data}
+            loading={courts.loading}
             busy={busy}
             canAssign={canAssign}
-            onAssign={() => openAssign(null)}
-            onCancel={setCancelTarget}
+            nextMatchup={upNext.data?.[0] ?? null}
+            onAssign={openAssign}
+            onStartUpNext={(matchup, courtId) =>
+              handleStartMatchup(matchup, courtId)
+            }
+            onFinishGame={setFinishTarget}
+            onScoreChange={(gameId, side, change) =>
+              run(
+                () => gamesApi.updateScore(gameId, side, change),
+                "Score updated.",
+              )
+            }
+            onSetStatus={(court: Court, status) =>
+              run(
+                () => courtsApi.setStatus(court.id, status),
+                status === "maintenance"
+                  ? `${court.name} is on maintenance.`
+                  : `${court.name} is available.`,
+              )
+            }
+            onAddCourt={(name) =>
+              run(() => courtsApi.create(name), `${name} added.`)
+            }
           />
-          <ActiveGamesSection
-            games={games.data}
-            loading={games.loading}
+
+          {qrFor && qrFor.qr_token && (
+            <PlayerQrCode
+              playerName={qrFor.name}
+              qrToken={qrFor.qr_token}
+              onClose={() => setQrFor(null)}
+            />
+          )}
+
+          {/* Register player */}
+          <Section
+            title="Register player"
+            subtitle="Walk-in or returning"
+            className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20"
+          >
+            <AddToQueueForm busy={busy} onJoin={handleAddToQueue} />
+          </Section>
+
+          <UpNextSection
+            matchups={upNext.data}
+            loading={upNext.loading}
             busy={busy}
-            onFinish={setFinishTarget}
+            canStart={availableCourts.length > 0}
+            onFormMatchup={() => setFormMatchup(true)}
+            onSmartForm={handleSmartForm}
+            onStart={handleStartMatchup}
+            onCancel={handleCancelMatchup}
           />
-        </div>
+
+          <Section className="grid gap-5 lg:grid-cols-2">
+            <QueueSection
+              entries={queue.data}
+              loading={queue.loading}
+              busy={busy}
+              canAssign={canAssign}
+              onAssign={() => openAssign(null)}
+              onCancel={setCancelTarget}
+            />
+            <ActiveGamesSection
+              games={games.data}
+              loading={games.loading}
+              busy={busy}
+              onFinish={setFinishTarget}
+            />
+          </Section>
+        </Container>
       </main>
 
       {assign && (
@@ -529,6 +513,6 @@ export default function AdminDashboard() {
         }}
         onCancel={() => setApproveTarget(null)}
       />
-    </div>
+    </Page>
   );
 }

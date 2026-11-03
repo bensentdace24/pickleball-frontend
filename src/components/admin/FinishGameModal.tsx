@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { Game } from "../../types";
 import { Button } from "../Button";
 import { Alert } from "../Feedback";
+import { Dialog, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../Dialog";
+import { Input, Checkbox, Field } from "../form/Input";
 
 interface Props {
   game: Game;
@@ -47,58 +49,40 @@ export function FinishGameModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-slate-900">
-          Finish Game #{game.id}
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">{game.court?.name}</p>
+    <Dialog open onClose={onClose} title={`Finish Game #${game.id}`} size="md">
+      <DialogHeader>
+        <DialogTitle>Finish Game #{game.id}</DialogTitle>
+        <DialogDescription>{game.court?.name}</DialogDescription>
+      </DialogHeader>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Team A
-              {game.team_a?.players?.length
-                ? ` (${game.team_a.players.map((p) => p.name).join(" / ")})`
-                : ""}
-            </label>
-            <input
+      <div className="flex flex-col gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={`Team A${game.team_a?.players?.length ? ` (${game.team_a.players.map((p) => p.name).join(" / ")})` : ""}`}>
+            <Input
               type="number"
               min={0}
               value={scoreA}
               onChange={(e) => setScoreA(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-lg font-bold"
               placeholder="0"
+              className="text-center text-lg font-bold"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Team B
-              {game.team_b?.players?.length
-                ? ` (${game.team_b.players.map((p) => p.name).join(" / ")})`
-                : ""}
-            </label>
-            <input
+          </Field>
+          <Field label={`Team B${game.team_b?.players?.length ? ` (${game.team_b.players.map((p) => p.name).join(" / ")})` : ""}`}>
+            <Input
               type="number"
               min={0}
               value={scoreB}
               onChange={(e) => setScoreB(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-lg font-bold"
               placeholder="0"
+              className="text-center text-lg font-bold"
             />
-          </div>
+          </Field>
         </div>
 
         {players.length > 0 && (
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-slate-700">
-                Put back in the queue?
-              </p>
+              <p className="text-sm font-medium text-text-secondary">Put back in the queue?</p>
               <button
                 type="button"
                 onClick={() =>
@@ -108,51 +92,39 @@ export function FinishGameModal({
                       : players.map((p) => p.id),
                   )
                 }
-                className="text-xs text-blue-600 underline"
+                className="text-xs text-primary-600 underline hover:text-primary-700"
               >
                 {requeue.length === players.length ? "Clear all" : "Select all"}
               </button>
             </div>
-            <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200">
+            <div className="space-y-1 rounded-lg border border-border">
               {players.map((p) => (
-                <li key={p.id}>
-                  <label className="flex cursor-pointer items-center gap-3 px-3 py-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={requeue.includes(p.id)}
-                      onChange={() => toggle(p.id)}
-                      className="h-4 w-4"
-                    />
-                    <span>{p.name}</span>
-                  </label>
-                </li>
+                <Field key={p.id} className="flex items-center gap-3 px-3 py-2">
+                  <Checkbox
+                    checked={requeue.includes(p.id)}
+                    onChange={() => toggle(p.id)}
+                    label={p.name}
+                  />
+                </Field>
               ))}
-            </ul>
-            <p className="mt-1 text-xs text-slate-500">
+            </div>
+            <p className="text-xs text-text-tertiary">
               Checked players join the back of the line with a new queue number.
             </p>
           </div>
         )}
 
-        {error && (
-          <div className="mt-4">
-            <Alert type="error">{error}</Alert>
-          </div>
-        )}
+        {error && <Alert type="error">{error}</Alert>}
 
-        <div className="mt-6 flex justify-end gap-3">
+        <DialogFooter>
           <Button variant="secondary" onClick={onClose} disabled={busy}>
             Cancel
           </Button>
-          <Button
-            variant="success"
-            disabled={busy || !ready}
-            onClick={() => onSubmit(a, b, requeue)}
-          >
+          <Button variant="success" disabled={busy || !ready} onClick={() => onSubmit(a, b, requeue)}>
             {busy ? "Saving…" : "Save & Finish Game"}
           </Button>
-        </div>
+        </DialogFooter>
       </div>
-    </div>
+    </Dialog>
   );
 }

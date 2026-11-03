@@ -1,3 +1,6 @@
+import { Card } from "../Card";
+import { Grid } from "../layout/Page";
+
 interface Props {
   players: number | null;
   waiting: number | null;
@@ -13,6 +16,14 @@ interface Stat {
   value: number | null;
   accent: "live" | "open" | "warn" | "muted" | "total";
 }
+
+const accentConfig: Record<Stat["accent"], { dot: string; value: string; badge: string }> = {
+  live: { dot: "bg-primary-500", value: "text-primary-600 dark:text-primary-400", badge: "primary" },
+  open: { dot: "bg-success-500", value: "text-success-600 dark:text-success-400", badge: "success" },
+  warn: { dot: "bg-warning-500", value: "text-warning-600 dark:text-warning-400", badge: "warning" },
+  muted: { dot: "bg-neutral-400", value: "text-neutral-600 dark:text-neutral-400", badge: "default" },
+  total: { dot: "bg-neutral-400", value: "text-text-primary", badge: "default" },
+};
 
 export function DashboardOverview({
   players,
@@ -33,43 +44,30 @@ export function DashboardOverview({
   ];
 
   return (
-    <section
-      aria-label="Dashboard summary"
-      className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6"
-    >
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="rounded-2xl border border-cyan-100 bg-white px-3.5 py-3 transition-colors hover:border-cyan-300"
-        >
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`overview-dot overview-dot--${stat.accent}`}
-              aria-hidden="true"
-            />
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
-              {stat.label}
-            </span>
-          </div>
-          <p
-            className={`mt-1.5 text-2xl font-extrabold tabular-nums leading-none ${
-              stat.accent === "live"
-                ? "text-amber-400"
-                : stat.accent === "open"
-                  ? "text-lime-400"
-                  : stat.accent === "warn"
-                    ? "text-amber-300"
-                    : "text-slate-900"
-            }`}
-          >
-            {loading && stat.value === null ? (
-              <span className="inline-block h-6 w-8 animate-pulse rounded bg-cyan-100" />
-            ) : (
-              (stat.value ?? "—")
-            )}
-          </p>
-        </div>
-      ))}
-    </section>
+    <Grid cols={4} gap={3} className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4" aria-label="Dashboard summary">
+      {stats.map((stat) => {
+        const config = accentConfig[stat.accent];
+        return (
+          <Card key={stat.label} variant="bordered" className="p-4 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2 w-2 rounded-full ${config.dot}`}
+                aria-hidden="true"
+              />
+              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                {stat.label}
+              </span>
+            </div>
+            <p className="mt-2 text-2xl font-extrabold tabular-nums leading-none {config.value}">
+              {loading && stat.value === null ? (
+                <span className="inline-block h-6 w-8 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
+              ) : (
+                stat.value ?? "—"
+              )}
+            </p>
+          </Card>
+        );
+      })}
+    </Grid>
   );
 }

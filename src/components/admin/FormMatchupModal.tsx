@@ -4,6 +4,10 @@ import { formatTime } from "../../lib/format";
 import { Button } from "../Button";
 import { Alert } from "../Feedback";
 import { StatusBadge } from "../StatusBadge";
+import { Dialog, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../Dialog";
+import { Card } from "../Card";
+import { Badge } from "../Badge";
+import { Flex } from "../layout/Page";
 
 interface Props {
   entries: QueueEntry[];
@@ -61,108 +65,87 @@ export function FormMatchupModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-slate-900">
-          Form an upcoming matchup
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          No court needed yet — this just reserves the pairing.
-        </p>
+    <Dialog open onClose={onClose} title="Form an upcoming matchup" size="lg">
+      <DialogHeader>
+        <DialogTitle>Form an upcoming matchup</DialogTitle>
+        <DialogDescription>No court needed yet — this just reserves the pairing.</DialogDescription>
+      </DialogHeader>
 
-        <div className="mt-4">
-          <p className="text-sm font-medium text-slate-700">Match type</p>
-          <div className="mt-1 flex gap-2">
-            <button
-              type="button"
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm font-medium text-text-secondary">Match type</p>
+          <Flex gap={2} className="mt-1">
+            <Button
+              variant={matchSize === 4 ? "primary" : "outline"}
+              size="sm"
               onClick={() => changeMatchSize(4)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium ${
-                matchSize === 4
-                  ? "border-blue-600 bg-blue-50 text-blue-700"
-                  : "border-slate-300 text-slate-600"
-              }`}
+              className="flex-1"
             >
               Doubles (4)
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant={matchSize === 2 ? "primary" : "outline"}
+              size="sm"
               onClick={() => changeMatchSize(2)}
-              className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium ${
-                matchSize === 2
-                  ? "border-blue-600 bg-blue-50 text-blue-700"
-                  : "border-slate-300 text-slate-600"
-              }`}
+              className="flex-1"
             >
               Singles (2)
-            </button>
-          </div>
+            </Button>
+          </Flex>
         </div>
 
-        <p className="mt-4 text-sm font-medium text-slate-700">
-          Team A ({countA}/{perSide}) &nbsp;vs&nbsp; Team B ({countB}/{perSide})
+        <p className="text-sm font-medium text-text-secondary">
+          Team A ({countA}/{perSide}) vs Team B ({countB}/{perSide})
         </p>
-        <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200">
-          {entries.map((entry) => {
-            const side = sides[entry.id];
-            return (
-              <li
-                key={entry.id}
-                className="flex items-center gap-2 px-3 py-2.5 text-sm"
-              >
-                <span className="font-semibold">#{entry.queue_number}</span>
-                <span className="flex-1">{entry.player?.name}</span>
-                <span className="hidden text-slate-500 sm:inline">
-                  {formatTime(entry.joined_at)}
-                </span>
-                <StatusBadge status={entry.status} />
-                <button
-                  type="button"
-                  onClick={() => setSide(entry.id, 0)}
-                  disabled={side !== 0 && countA >= perSide}
-                  className={`rounded-md px-2 py-1 text-xs font-semibold ${
-                    side === 0
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-100 text-slate-600 disabled:opacity-40"
-                  }`}
-                >
-                  A
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSide(entry.id, 1)}
-                  disabled={side !== 1 && countB >= perSide}
-                  className={`rounded-md px-2 py-1 text-xs font-semibold ${
-                    side === 1
-                      ? "bg-amber-600 text-white"
-                      : "bg-slate-100 text-slate-600 disabled:opacity-40"
-                  }`}
-                >
-                  B
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <Card variant="bordered" className="max-h-64 overflow-y-auto">
+          <ul className="divide-y divide-border">
+            {entries.map((entry) => {
+              const side = sides[entry.id];
+              return (
+                <li key={entry.id} className="flex items-center gap-2 px-3 py-2.5 text-sm">
+                  <Badge variant="default" size="sm" className="shrink-0 font-semibold">
+                    #{entry.queue_number}
+                  </Badge>
+                  <span className="min-w-0 flex-1 truncate text-text-primary">
+                    {entry.player?.name}
+                  </span>
+                  <span className="hidden text-text-tertiary sm:inline">
+                    {formatTime(entry.joined_at)}
+                  </span>
+                  <StatusBadge status={entry.status} />
+                  <Button
+                    variant={side === 0 ? "primary" : "ghost"}
+                    size="sm"
+                    disabled={side !== 0 && countA >= perSide}
+                    onClick={() => setSide(entry.id, 0)}
+                  >
+                    A
+                  </Button>
+                  <Button
+                    variant={side === 1 ? "warning" : "ghost"}
+                    size="sm"
+                    disabled={side !== 1 && countB >= perSide}
+                    onClick={() => setSide(entry.id, 1)}
+                  >
+                    B
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
 
-        {error && (
-          <div className="mt-4">
-            <Alert type="error">{error}</Alert>
-          </div>
-        )}
+        {error && <Alert type="error">{error}</Alert>}
 
-        <div className="mt-6 flex justify-end gap-3">
+        <DialogFooter>
           <Button variant="secondary" onClick={onClose} disabled={busy}>
             Close
           </Button>
           <Button disabled={busy || !ready} onClick={submit}>
             {busy ? "Forming…" : "Form Matchup"}
           </Button>
-        </div>
+        </DialogFooter>
       </div>
-    </div>
+    </Dialog>
   );
 }

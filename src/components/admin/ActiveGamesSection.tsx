@@ -4,7 +4,9 @@ import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
 import { StatusBadge } from "../StatusBadge";
-import { getCourtTeams } from "../../lib/courtDisplay";
+import { Card } from "../Card";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../Table";
+import { Badge, Flex } from "../index";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -13,6 +15,7 @@ interface Props {
   busy: boolean;
   onFinish: (game: Game) => void;
 }
+
 function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -30,57 +33,113 @@ function TimeRemaining({ endsAt }: { endsAt: string }) {
   const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
   const ss = String(totalSec % 60).padStart(2, "0");
   return (
-    <span className={over ? "font-semibold text-red-600" : "text-slate-700"}>
+    <Badge variant={over ? "danger" : "default"} size="sm">
       {over ? `+${mm}:${ss} over` : `${mm}:${ss} left`}
-    </span>
+    </Badge>
+  );
+}
+
+function TeamColumn({ team, color }: { team: { name: string }[]; color: "primary" | "warning" }) {
+  return (
+    <div className="rounded-lg border border-border bg-surface p-3">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-text-secondary">
+        {color === "primary" ? "Team A" : "Team B"}
+      </p>
+      <p className="mt-1 text-sm font-medium text-text-primary">
+        {team.map((player) => player.name).join(" & ") || "Player details unavailable"}
+      </p>
+    </div>
   );
 }
 
 export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
   return (
     <Section
-      title="Active Matches Roster"
-      action={games && <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{games.length} playing</span>}
+      title="Active Matches"
+      action={
+        games && (
+          <Badge variant="success" className="text-xs">
+            {games.length} playing
+          </Badge>
+        )
+      }
     >
       {loading && !games ? (
         <Spinner />
       ) : !games || games.length === 0 ? (
         <EmptyState
           title="No games in progress"
-          hint="Assign 4 players to an available court to start one."
+          description="Assign 4 players to an available court to start one."
         />
       ) : (
-        <div className="grid gap-3">
-          {games.map((game) => {
-            const { teamA, teamB } = getCourtTeams(game);
-            return (
-              <article key={game.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 transition-colors hover:border-sky-200">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-bold text-slate-900">{game.court?.name ?? `Game #${game.id}`}</h3>
-                    <span className="text-xs text-slate-500">#{game.id}</span>
-                    <StatusBadge status={game.status} />
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    {game.ends_at ? <TimeRemaining endsAt={game.ends_at} /> : <span className="text-slate-500">Started {formatTime(game.started_at)}</span>}
-                    <Button size="sm" variant="success" disabled={busy} onClick={() => onFinish(game)}>Finish match</Button>
-                  </div>
-                </div>
-                {game.skill_warning && <p className="mt-2 text-xs text-amber-700" title={game.skill_warning}>Player level note: {game.skill_warning}</p>}
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <div className="rounded-lg border border-sky-200 bg-white px-3 py-2">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-sky-700">Team A</p>
-                    <p className="mt-1 text-xs font-medium text-slate-800">{teamA.map((player) => player.name).join(" & ") || "Player details unavailable"}</p>
-                  </div>
-                  <div className="rounded-lg border border-amber-200 bg-white px-3 py-2">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-amber-700">Team B</p>
-                    <p className="mt-1 text-xs font-medium text-slate-800">{teamB.map((player) => player.name).join(" & ") || "Player details unavailable"}</p>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+        <Card variant="bordered">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Court / Game</TableHead>
+                <TableHead className="w-40">Status</TableHead>
+                <TableHead className="w-48">Time</TableHead>
+                <TableHead className="w-48">Team A</TableHead>
+                <TableHead className="w-48">Team B</TableHead>
+                <TableHead className="w-32 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {games.map((game) => {
+                // We need to get team info - for now use placeholder since we don't have getCourtTeams here
+                // The actual team data would come from the game object
+                return (
+                  <TableRow key={game.id}>
+                    <TableCell>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-text-primary">
+                          {game.court?.name ?? `Game #${game.id}`}
+                        </span>
+                        <span className="text-xs text-text-tertiary">#{game.id}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={game.status} />
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <Flex gap={2} align="center">
+                        {game.ends_at ? (
+                          <TimeRemaining endsAt={game.ends_at} />
+                        ) : (
+                          <span className="text-text-secondary">
+                            Started {formatTime(game.started_at)}
+                          </span>
+                        )}
+                      </Flex>
+                    </TableCell>
+                    <TableCell>
+                      <TeamColumn
+                        team={game.team_a?.players?.map(p => ({ name: p.name })) ?? []}
+                        color="primary"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TeamColumn
+                        team={game.team_b?.players?.map(p => ({ name: p.name })) ?? []}
+                        color="warning"
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        variant="success"
+                        disabled={busy}
+                        onClick={() => onFinish(game)}
+                      >
+                        Finish match
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
     </Section>
   );

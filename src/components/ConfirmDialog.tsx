@@ -1,10 +1,11 @@
-import { Button } from "./Button";
+import { Dialog, DialogFooter, Button } from "./index";
 
-interface Props {
+interface ConfirmDialogProps {
   open: boolean;
   title: string;
   message: string;
   confirmLabel: string;
+  variant?: "primary" | "success" | "warning" | "danger";
   danger?: boolean;
   busy?: boolean;
   onConfirm: () => void;
@@ -16,34 +17,31 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel,
-  danger,
+  variant = "primary",
+  danger = false,
   busy,
   onConfirm,
   onCancel,
-}: Props) {
-  if (!open) return null;
+}: ConfirmDialogProps) {
+  const buttonVariant = danger ? "danger" : variant;
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-      role="dialog"
-      aria-modal="true"
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      title={title}
+      size="sm"
+      closeOnOverlayClick={!busy}
+      closeOnEscape={!busy}
     >
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-        <p className="mt-2 text-sm text-slate-600">{message}</p>
-        <div className="mt-6 flex flex-col-reverse justify-end gap-3 sm:flex-row">
-          <Button variant="secondary" onClick={onCancel} disabled={busy}>
-            Keep it
-          </Button>
-          <Button
-            variant={danger ? "danger" : "primary"}
-            onClick={onConfirm}
-            disabled={busy}
-          >
-            {busy ? "Working…" : confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
+      <p className="text-text-secondary">{message}</p>
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={busy}>
+          Cancel
+        </Button>
+        <Button variant={buttonVariant} onClick={onConfirm} disabled={busy} loading={busy}>
+          {confirmLabel}
+        </Button>
+      </DialogFooter>
+    </Dialog>
   );
 }

@@ -4,6 +4,8 @@ import type { SkillLevel } from "../../types";
 import { Button } from "../Button";
 import { Alert } from "../Feedback";
 import { MatchTypePicker } from "../MatchTypePicker";
+import { Card } from "../Card";
+import { Input, Select, Field } from "../form/Input";
 import type { MatchType } from "../../types";
 
 interface Props {
@@ -49,74 +51,59 @@ export function JoinForm({ busy, onJoin }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto flex max-w-md flex-col gap-4 rounded-2xl border border-white/80 bg-white p-5 shadow-xl shadow-emerald-950/10 ring-1 ring-slate-200/70 sm:p-7">
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Full name
-        </label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={255}
+    <Card variant="elevated" className="max-w-md mx-auto p-6">
+      <form onSubmit={submit} className="flex flex-col gap-4">
+        <Field
+          label="Full name"
+          error={fieldErrors.name?.[0]}
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-          placeholder="Juan Dela Cruz"
-        />
-        {fieldErrors.name && (
-          <p className="mt-1 text-sm text-red-600">{fieldErrors.name[0]}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Phone (optional)
-        </label>
-        <input
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          maxLength={30}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-          placeholder="09171234567"
-        />
-        {fieldErrors.phone && (
-          <p className="mt-1 text-sm text-red-600">{fieldErrors.phone[0]}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          Skill level (optional)
-        </label>
-        <select
-          value={skill}
-          onChange={(e) => setSkill(e.target.value as SkillLevel | "")}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
         >
-          <option value="">Not specified</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-        </select>
-        {fieldErrors.skill_level && (
-          <p className="mt-1 text-sm text-red-600">
-            {fieldErrors.skill_level[0]}
-          </p>
-        )}
-      </div>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={255}
+            required
+            placeholder="Juan Dela Cruz"
+            error={!!fieldErrors.name?.[0]}
+          />
+        </Field>
 
-      {formError && <Alert type="error">{formError}</Alert>}
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          What do you want to play?
-        </label>
-        <div className="mt-1">
-          <MatchTypePicker value={matchType} onChange={setMatchType} />
-        </div>
-      </div>
+        <Field label="Phone (optional)" error={fieldErrors.phone?.[0]}>
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            maxLength={30}
+            placeholder="09171234567"
+            error={!!fieldErrors.phone?.[0]}
+          />
+        </Field>
 
-      <Button type="submit" disabled={busy || !name.trim()} className="w-full">
-        {busy ? "Joining…" : "Join Queue"}
-      </Button>
-    </form>
+        <Field label="Skill level (optional)" error={fieldErrors.skill_level?.[0]}>
+          <Select
+            value={skill}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSkill(e.target.value as SkillLevel | "")}
+            error={!!fieldErrors.skill_level?.[0]}
+            options={[
+              { value: "", label: "Not specified" },
+              { value: "beginner", label: "Beginner" },
+              { value: "intermediate", label: "Intermediate" },
+              { value: "advanced", label: "Advanced" },
+            ]}
+          />
+        </Field>
+
+        {formError && <Alert type="error">{formError}</Alert>}
+
+        <Field label="What do you want to play?">
+          <div className="mt-1">
+            <MatchTypePicker value={matchType} onChange={setMatchType} />
+          </div>
+        </Field>
+
+        <Button type="submit" disabled={busy || !name.trim()} className="w-full">
+          {busy ? "Joining…" : "Join Queue"}
+        </Button>
+      </form>
+    </Card>
   );
 }

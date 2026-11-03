@@ -2,6 +2,8 @@ import type { Matchup } from "../../types";
 import { Button } from "../Button";
 import { EmptyState, Spinner } from "../Feedback";
 import { Section } from "../Section";
+import { Card } from "../Card";
+import { Badge } from "../Badge";
 import { formatWait } from "../../lib/format";
 
 interface Props {
@@ -41,7 +43,7 @@ export function UpNextSection({
         disabled={busy || (matchups?.length ?? 0) >= 3}
         onClick={() => onSmartForm(4)}
       >
-        ⚡ Smart Form (Doubles)
+        Smart Form (Doubles)
       </Button>
       <Button
         size="sm"
@@ -49,7 +51,7 @@ export function UpNextSection({
         disabled={busy || (matchups?.length ?? 0) >= 3}
         onClick={() => onSmartForm(2)}
       >
-        ⚡ Smart Form (Singles)
+        Smart Form (Singles)
       </Button>
     </div>
   );
@@ -61,43 +63,43 @@ export function UpNextSection({
       ) : !matchups || matchups.length === 0 ? (
         <EmptyState
           title="No matchups formed yet"
-          hint="Form a matchup so it's ready the moment a court frees up."
+          description="Form a matchup so it's ready the moment a court frees up."
         />
       ) : (
-        <ul className="space-y-3">
+        <div className="space-y-3">
           {matchups.map((m, i) => (
-            <li key={m.id} className="rounded-lg border border-slate-200 p-3">
+            <Card key={m.id} variant="bordered" className="p-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase text-slate-500">
+                <Badge variant="info" size="sm">
                   {i === 0 ? "Up Next" : `Up Next #${i + 1}`}
-                </span>
-                <span className="text-xs text-slate-400">
+                </Badge>
+                <Badge variant="default" size="sm">
                   {m.match_size === 4 ? "Doubles" : "Singles"}
-                </span>
+                </Badge>
               </div>
 
               {m.skill_warning && (
-                <p className="mt-1 rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">
-                  ⚠️ {m.skill_warning}
-                </p>
+                <div className="mt-2 rounded-md bg-warning-50 border border-warning-200 px-2 py-1 text-xs font-medium text-warning-800 dark:bg-warning-900/30 dark:border-warning-800 dark:text-warning-400">
+                  ⚠ {m.skill_warning}
+                </div>
               )}
 
               {formatWait(m.estimated_minutes) && (
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-text-secondary">
                   Est. start: {formatWait(m.estimated_minutes)}
                 </p>
               )}
 
               <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-md bg-blue-50 px-2 py-1.5">
-                  <p className="font-semibold text-blue-900">Team A</p>
-                  <p className="text-blue-800">
+                <div className="rounded-md bg-primary-50 px-2 py-1.5 dark:bg-primary-900/20">
+                  <p className="font-semibold text-primary-900 dark:text-primary-400">Team A</p>
+                  <p className="text-primary-800 dark:text-primary-300">
                     {m.team_a.map((p) => p.name).join(", ")}
                   </p>
                 </div>
-                <div className="rounded-md bg-amber-50 px-2 py-1.5">
-                  <p className="font-semibold text-amber-900">Team B</p>
-                  <p className="text-amber-800">
+                <div className="rounded-md bg-warning-50 px-2 py-1.5 dark:bg-warning-900/20">
+                  <p className="font-semibold text-warning-900 dark:text-warning-400">Team B</p>
+                  <p className="text-warning-800 dark:text-warning-300">
                     {m.team_b.map((p) => p.name).join(", ")}
                   </p>
                 </div>
@@ -113,7 +115,7 @@ export function UpNextSection({
                     {canStart ? "Start Next" : "No court free yet"}
                   </Button>
                 ) : (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-text-tertiary">
                     Waiting behind Up Next
                   </span>
                 )}
@@ -126,9 +128,9 @@ export function UpNextSection({
                   Cancel Matchup
                 </Button>
               </div>
-            </li>
+            </Card>
           ))}
-        </ul>
+        </div>
       )}
     </Section>
   );

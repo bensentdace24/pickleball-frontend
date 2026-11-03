@@ -5,6 +5,8 @@ import { Button } from "../Button";
 import { MatchTypePicker } from "../MatchTypePicker";
 import { PlayerSearchField } from "../PlayerSearchField";
 import { PlayerQrCode } from "./PlayerQrCode";
+import { Alert } from "../Feedback";
+import { Input, Select, Field } from "../form/Input";
 
 interface Props {
   busy: boolean;
@@ -82,46 +84,39 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
 
         {!selected && (
           <>
-            <div>
-              <label className="block text-xs font-medium text-slate-600">
-                Phone (optional)
-              </label>
-              <input
+            <Field label="Phone (optional)" className="w-32">
+              <Input
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
                 placeholder="09xxxxxxxxx"
                 maxLength={30}
-                className="mt-1 w-32 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-600">
-                Skill (optional)
-              </label>
-              <select
+            </Field>
+            <Field label="Skill (optional)">
+              <Select
                 value={skill}
-                onChange={(e) => setSkill(e.target.value as SkillLevel | "")}
-                className="mt-1 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
-              >
-                <option value="">—</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-            </div>
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSkill(e.target.value as SkillLevel | "")}
+                options={[
+                  { value: "", label: "—" },
+                  { value: "beginner", label: "Beginner" },
+                  { value: "intermediate", label: "Intermediate" },
+                  { value: "advanced", label: "Advanced" },
+                ]}
+              />
+            </Field>
           </>
         )}
       </div>
 
       {selected && (
-        <div className="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
+        <div className="rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-800 dark:bg-primary-900/20 dark:text-primary-300">
           <span className="font-semibold">{selected.player.name}</span>'s
           record: {selected.detail.stats.wins}W-
           {selected.detail.stats.losses}L-{selected.detail.stats.draws}D ·{" "}
           {selected.detail.stats.total_points} pts ·{" "}
           {selected.detail.stats.games_played} games
           {blockedByActiveQueue && (
-            <span className="ml-2 font-semibold text-red-600">
+            <span className="ml-2 font-semibold text-danger-600 dark:text-danger-400">
               ⚠ Already in queue ({selected.detail.current_status})
             </span>
           )}
@@ -140,24 +135,17 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
         </div>
       )}
 
-      <div>
-        <label className="block text-xs font-medium text-slate-600">
-          Wants to play
-        </label>
+      <Field label="Wants to play">
         <div className="mt-1">
           <MatchTypePicker value={matchType} onChange={setMatchType} />
         </div>
-      </div>
+      </Field>
 
       <div>
-        <Button
-          type="submit"
-          size="sm"
-          disabled={busy || !name.trim() || blockedByActiveQueue}
-        >
+        <Button type="submit" size="sm" disabled={busy || !name.trim() || blockedByActiveQueue}>
           Add to Queue
         </Button>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <Alert type="error" className="mt-2">{error}</Alert>}
       </div>
 
       {showQr && selected?.player.qr_token && (

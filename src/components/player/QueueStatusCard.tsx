@@ -2,6 +2,8 @@ import type { QueueEntry } from "../../types";
 import { ordinal } from "../../lib/format";
 import { Button } from "../Button";
 import { StatusBadge } from "../StatusBadge";
+import { Card } from "../Card";
+import { Alert } from "../Feedback";
 
 interface Props {
   entry: QueueEntry;
@@ -16,46 +18,41 @@ export function QueueStatusCard({ entry, busy, onCancel, onLeave }: Props) {
   const game = entry.game;
 
   return (
-    <div className="mx-auto max-w-md rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+    <Card variant="elevated" className="max-w-md mx-auto p-6">
       <div className="flex items-start justify-between">
         {isPending && (
-          <div className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Registered! Please see the front desk to confirm your spot and get
-            your queue number.
-          </div>
+          <Alert type="warning" className="mb-4">
+            Registered! Please see the front desk to confirm your spot and get your queue number.
+          </Alert>
         )}
         <div>
-          <p className="text-sm text-slate-500">Player</p>
-          <p className="text-lg font-bold text-slate-900">
-            {entry.player?.name}
-          </p>
+          <p className="text-sm text-text-secondary">Player</p>
+          <p className="text-lg font-bold text-text-primary">{entry.player?.name}</p>
         </div>
         <StatusBadge status={entry.status} />
       </div>
 
       <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
         <div>
-          <dt className="text-slate-500">Queue Number</dt>
-          <dd className="text-xl font-bold text-slate-900">
-            #{entry.queue_number}
-          </dd>
+          <dt className="text-text-secondary">Queue Number</dt>
+          <dd className="text-xl font-bold text-text-primary">#{entry.queue_number}</dd>
         </div>
         <div>
-          <dt className="text-slate-500">Position</dt>
-          <dd className="text-xl font-bold text-slate-900">
+          <dt className="text-text-secondary">Position</dt>
+          <dd className="text-xl font-bold text-text-primary">
             {entry.position ? ordinal(entry.position) : "—"}
           </dd>
         </div>
       </dl>
 
       {game && (
-        <div className="mt-5 rounded-lg bg-blue-50 p-3 text-sm">
-          <p className="font-medium text-blue-900">
+        <div className="mt-5 rounded-lg bg-primary-50 p-3 text-sm dark:bg-primary-900/20">
+          <p className="font-medium text-primary-900 dark:text-primary-300">
             {entry.status === "completed" ? "Played on" : "Playing on"}{" "}
             {game.court?.name}
           </p>
           {game.players && (
-            <p className="mt-1 text-blue-700">
+            <p className="mt-1 text-primary-700 dark:text-primary-400">
               With: {game.players.map((p) => p.name).join(", ")}
             </p>
           )}
@@ -84,6 +81,6 @@ export function QueueStatusCard({ entry, busy, onCancel, onLeave }: Props) {
           </Button>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

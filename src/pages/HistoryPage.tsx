@@ -4,6 +4,8 @@ import { AdminHeader } from "../components/admin/AdminHeader";
 import { useAsync } from "../hooks/useAsync";
 import { gamesApi } from "../services/api";
 import type { TeamResult } from "../types";
+import { Page, Container, Card, Input, Button } from "../components";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/Table";
 
 function duration(start: string | null, end: string | null) {
   if (!start || !end) return "—";
@@ -16,10 +18,10 @@ function duration(start: string | null, end: string | null) {
 function Team({ team }: { team?: TeamResult }) {
   const won = team?.result === "win";
   return (
-    <div className={won ? "font-semibold text-lime-400" : "text-cream-100"}>
+    <div className={won ? "font-semibold text-success-500" : "text-text-primary"}>
       {team?.players?.map((p) => p.name).join(", ") || "—"}
-      <span className="ml-2 text-cream-50">{team?.points ?? "-"}</span>
-      {won && <span className="ml-1 text-xs">(win)</span>}
+      <span className="ml-2 text-text-secondary">{team?.points ?? "-"}</span>
+      {won && <span className="ml-1 text-xs text-success-500">(win)</span>}
     </div>
   );
 }
@@ -29,8 +31,7 @@ export default function HistoryPage() {
   const [applied, setApplied] = useState("");
 
   const { data, loading, error, refresh } = useAsync(
-    () =>
-      gamesApi.list("completed", { limit: 100, player: applied || undefined }),
+    () => gamesApi.list("completed", { limit: 100, player: applied || undefined }),
     15000,
   );
 
@@ -45,95 +46,73 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ink-950 text-cream-50">
+    <Page withBackground>
       <AdminHeader active="history" />
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-400">Past play</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-cream-50 sm:text-3xl">Match history</h1>
-          <p className="mt-1 text-sm text-cream-200">Search completed games by player.</p>
-        </div>
-        <form onSubmit={submit} className="mb-4 flex gap-2">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by player name"
-            className="w-full max-w-xs rounded-lg border border-ink-600 bg-ink-800 px-3 py-2 text-sm text-cream-50 placeholder:text-mist-400 focus:border-lemon-400 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="rounded-lg bg-lemon-400 px-4 py-2 text-sm font-bold text-lemon-950 transition-colors hover:bg-lemon-300"
-          >
-            Search
-          </button>
-          {applied && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setApplied("");
-              }}
-              className="text-sm text-cream-200 underline underline-offset-4 hover:text-cream-50"
-            >
-              Clear
-            </button>
-          )}
-        </form>
-
-        <div className="rounded-2xl border border-ink-600 bg-ink-800 p-4 shadow-sm sm:p-5">
-          {error && <p className="text-sm text-rose-400">{error}</p>}
-          {loading && !data ? (
-            <Spinner />
-          ) : !data || data.length === 0 ? (
-            <EmptyState
-              title={
-                applied
-                  ? "No games found for that player"
-                  : "No finished games yet"
-              }
-              hint="Finished games with scores show up here."
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        <Container size="full">
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-success-500">Past play</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Match history</h1>
+            <p className="mt-1 text-sm text-text-secondary">Search completed games by player.</p>
+          </div>
+          <form onSubmit={submit} className="mb-4 flex gap-2">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by player name"
+              className="w-full max-w-xs"
             />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-sm">
-                <thead className="border-b border-ink-600 text-xs uppercase text-cream-200">
-                  <tr>
-                    <th className="py-2 pr-3">Game</th>
-                    <th className="py-2 pr-3">Finished</th>
-                    <th className="py-2 pr-3">Court</th>
-                    <th className="py-2 pr-3">Team A</th>
-                    <th className="py-2 pr-3">Team B</th>
-                    <th className="py-2 pr-3">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-600">
-                  {data.map((g) => (
-                    <tr key={g.id} className="text-cream-100 transition-colors hover:bg-ink-700/60">
-                      <td className="py-3 pr-3 font-semibold text-cream-50">#{g.id}</td>
-                      <td className="py-3 pr-3">
-                        {g.completed_at
-                          ? new Date(g.completed_at).toLocaleString()
-                          : "—"}
-                      </td>
-                      <td className="py-3 pr-3">{g.court?.name ?? "—"}</td>
-                      <td className="py-3 pr-3">
-                        <Team team={g.team_a} />
-                      </td>
-                      <td className="py-3 pr-3">
-                        <Team team={g.team_b} />
-                      </td>
-                      <td className="py-3 pr-3">
-                        {duration(g.started_at, g.completed_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+            <Button type="submit">Search</Button>
+            {applied && (
+              <Button variant="ghost" size="sm" onClick={() => { setSearch(""); setApplied(""); }}>
+                Clear
+              </Button>
+            )}
+          </form>
+
+          <Card variant="bordered">
+            {error && <div className="p-4"><div className="text-sm text-danger-600 dark:text-danger-400">{error}</div></div>}
+            {loading && !data ? (
+              <Spinner />
+            ) : !data || data.length === 0 ? (
+              <EmptyState
+                title={applied ? "No games found for that player" : "No finished games yet"}
+                description="Finished games with scores show up here."
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Game</TableHead>
+                      <TableHead>Finished</TableHead>
+                      <TableHead>Court</TableHead>
+                      <TableHead>Team A</TableHead>
+                      <TableHead>Team B</TableHead>
+                      <TableHead>Duration</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.map((g) => (
+                      <TableRow key={g.id} clickable className="hover:bg-surface-sunken">
+                        <TableCell className="font-semibold text-text-primary">#{g.id}</TableCell>
+                        <TableCell className="text-text-secondary">
+                          {g.completed_at ? new Date(g.completed_at).toLocaleString() : "—"}
+                        </TableCell>
+                        <TableCell>{g.court?.name ?? "—"}</TableCell>
+                        <TableCell><Team team={g.team_a} /></TableCell>
+                        <TableCell><Team team={g.team_b} /></TableCell>
+                        <TableCell className="text-text-secondary">{duration(g.started_at, g.completed_at)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </Card>
+        </Container>
       </main>
-    </div>
+    </Page>
   );
 }

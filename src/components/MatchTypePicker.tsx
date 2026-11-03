@@ -1,4 +1,5 @@
 import type { MatchType } from "../types";
+import { Button } from "./Button";
 
 interface Props {
   value: MatchType;
@@ -15,18 +16,15 @@ export function MatchTypePicker({ value, onChange }: Props) {
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((opt) => (
-        <button
+        <Button
           key={opt.value}
           type="button"
+          variant={value === opt.value ? "primary" : "outline"}
+          size="sm"
           onClick={() => onChange(opt.value)}
-          className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
-            value === opt.value
-              ? "border-blue-600 bg-blue-50 text-blue-700"
-              : "border-slate-300 text-slate-600"
-          }`}
         >
           {opt.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

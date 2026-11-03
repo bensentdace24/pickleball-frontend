@@ -1,5 +1,6 @@
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "../Button";
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../Dialog";
 
 interface Props {
   playerName: string;
@@ -11,31 +12,22 @@ export function PlayerQrCode({ playerName, qrToken, onClose }: Props) {
   const url = `${window.location.origin}/status/${qrToken}`;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 text-center shadow-xl">
-        <h3 className="text-lg font-semibold text-slate-900">
-          {playerName}'s QR Code
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Scan with your phone camera to check your status anytime.
-        </p>
+    <Dialog open onClose={onClose} title={`${playerName}'s QR Code`} size="md">
+      <DialogHeader>
+        <DialogTitle>{playerName}'s QR Code</DialogTitle>
+        <DialogDescription>Scan with your phone camera to check your status anytime.</DialogDescription>
+      </DialogHeader>
 
-        <div className="mt-4 flex justify-center">
-          <div className="rounded-lg border border-slate-200 p-4">
-            <QRCodeSVG value={url} size={200} />
-          </div>
+      <div className="flex flex-col items-center gap-4">
+        <div className="rounded-lg border border-border p-4 bg-surface">
+          <QRCodeSVG value={url} size={200} />
         </div>
+        <p className="break-all text-xs text-text-tertiary">{url}</p>
 
-        <p className="mt-3 break-all text-xs text-slate-400">{url}</p>
-
-        <Button className="mt-5 w-full" onClick={onClose}>
-          Done
-        </Button>
+        <DialogFooter>
+          <Button className="w-full" onClick={onClose}>Done</Button>
+        </DialogFooter>
       </div>
-    </div>
+    </Dialog>
   );
 }

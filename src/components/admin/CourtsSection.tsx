@@ -9,6 +9,8 @@ import type {
 } from "../../types";
 import { getCourtTeams } from "../../lib/courtDisplay";
 import { CourtStatusBadge } from "../CourtStatusBadge";
+import { Section } from "../Section";
+import { Grid } from "../layout/Page";
 
 interface MiniCourtProps {
   court: Court | CourtActivity;
@@ -347,13 +349,13 @@ export function MiniCourt({
               <stop
                 offset="0"
                 stopColor={
-                  maintenance ? "#8b989c" : "#bceef2"
+                  maintenance ? "var(--color-border)" : "var(--color-primary-100)"
                 }
               />
               <stop
                 offset="1"
                 stopColor={
-                  maintenance ? "#77868a" : "#f2bada"
+                  maintenance ? "var(--color-surface-sunken)" : "var(--color-primary-200)"
                 }
               />
             </linearGradient>
@@ -364,22 +366,10 @@ export function MiniCourt({
               x2="1"
               y2="0"
             >
-              <stop
-                offset="0"
-                stopColor={maintenance ? "#94a3a8" : "#35cbd8"}
-              />
-              <stop
-                offset="50%"
-                stopColor={maintenance ? "#77888c" : "#20b9c9"}
-              />
-              <stop
-                offset="50%"
-                stopColor={maintenance ? "#77888c" : "#f06aae"}
-              />
-              <stop
-                offset="100%"
-                stopColor={maintenance ? "#66777b" : "#e957a0"}
-              />
+              <stop offset="0" stopColor={maintenance ? "var(--color-border)" : "var(--color-primary-600)"} />
+              <stop offset="50%" stopColor={maintenance ? "var(--color-surface-sunken)" : "var(--color-primary-700)"} />
+              <stop offset="50%" stopColor={maintenance ? "var(--color-surface-sunken)" : "var(--color-accent-500)"} />
+              <stop offset="100%" stopColor={maintenance ? "var(--color-surface)" : "var(--color-accent-600)"} />
             </linearGradient>
             <linearGradient
               id={`court-kitchen-${id}`}
@@ -391,13 +381,13 @@ export function MiniCourt({
               <stop
                 offset="0"
                 stopColor={
-                  maintenance ? "#78888d" : "#b9f2f4"
+                  maintenance ? "var(--color-surface-sunken)" : "var(--color-primary-200)"
                 }
               />
               <stop
                 offset="1"
                 stopColor={
-                  maintenance ? "#66777b" : "#f9d3e7"
+                  maintenance ? "var(--color-surface)" : "var(--color-accent-100)"
                 }
               />
             </linearGradient>
@@ -420,7 +410,7 @@ export function MiniCourt({
               patternUnits="userSpaceOnUse"
               patternTransform="rotate(45)"
             >
-              <rect width="6" height="12" fill="#f59e0b" fillOpacity="0.2" />
+              <rect width="6" height="12" fill="var(--color-accent-500)" fillOpacity="0.2" />
             </pattern>
           </defs>
 
@@ -504,47 +494,47 @@ export function MiniCourt({
           )}
           {available && (
             <g aria-hidden="true" className="mini-court__idle-markers">
-              <circle cx="68" cy="78" r="11" fill="#ed5aa7" fillOpacity=".18" />
+              <circle cx="68" cy="78" r="11" fill="var(--color-primary-500)" fillOpacity=".18" />
               <circle
                 cx="68"
                 cy="78"
                 r="5.5"
-                fill="#ed5aa7"
+                fill="var(--color-primary-500)"
                 stroke="#fff"
                 strokeWidth="1.5"
-                fillOpacity=".72"
+                fillOpacity=".8"
               />
               <circle
                 cx="212"
                 cy="88"
                 r="11"
-                fill="#35cbd8"
+                fill="var(--color-accent-500)"
                 fillOpacity=".2"
               />
               <circle
                 cx="212"
                 cy="88"
                 r="5.5"
-                fill="#35cbd8"
+                fill="var(--color-accent-500)"
                 stroke="#fff"
                 strokeWidth="1.5"
-                fillOpacity=".65"
+                fillOpacity=".75"
               />
               <ellipse
                 cx="140"
                 cy="88"
                 rx="4.5"
                 ry="2.3"
-                fill="#173d42"
+                fill="var(--color-surface)"
                 fillOpacity=".2"
               />
-              <circle cx="140" cy="82" r="7" fill="#ffffff" fillOpacity=".4" />
+              <circle cx="140" cy="82" r="7" fill="#fff" fillOpacity=".4" />
               <circle
                 cx="140"
                 cy="82"
                 r="3.8"
-                fill="#ffffff"
-                stroke="#ed5aa7"
+                fill="#fff"
+                stroke="var(--color-primary-500)"
                 strokeWidth="1.1"
               />
             </g>
@@ -552,8 +542,8 @@ export function MiniCourt({
           <path className="mini-court__net-shadow" d="M143 14v128" />
           <path className="mini-court__net" d="M140 13v130" />
           <path className="mini-court__net-mesh" d="M140 16v124" />
-          <circle className="mini-court__net-post" cx="140" cy="13" r="3" />
-          <circle className="mini-court__net-post" cx="140" cy="143" r="3" />
+          <circle className="mini-court__net-post" cx="140" cy="13" r="3" fill="var(--color-sky-500)" />
+          <circle className="mini-court__net-post" cx="140" cy="143" r="3" fill="var(--color-sky-500)" />
 
           {playing && (
             <>
@@ -649,7 +639,7 @@ export function MiniCourt({
           )}
           {maintenance && (
             <g>
-              <path d="M24 18H256V138H24z" fill="#0f172a" fillOpacity=".45" />
+              <path d="M24 18H256V138H24z" fill="var(--color-surface)" fillOpacity=".55" />
               <rect
                 className="mini-court__maintenance-pill"
                 x="80"
@@ -834,20 +824,22 @@ export function CourtsSection({
   busy,
 }: CourtsSectionProps) {
   return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <Section title="Courts">
       {loading ? (
-        <p className="text-sm text-slate-400">Loading courts…</p>
+        <p className="text-sm text-text-secondary">Loading courts…</p>
       ) : (
-        (courts ?? []).map((court) => (
-          <MiniCourt
-            key={court.id}
-            court={court}
-            onCourtClick={canAssign ? () => onAssign(court.id) : undefined}
-            onScoreChange={onScoreChange}
-            scoreBusy={busy}
-          />
-        ))
+        <Grid cols={3} gap={4} className="sm:grid-cols-2">
+          {(courts ?? []).map((court) => (
+            <MiniCourt
+              key={court.id}
+              court={court}
+              onCourtClick={canAssign ? () => onAssign(court.id) : undefined}
+              onScoreChange={onScoreChange}
+              scoreBusy={busy}
+            />
+          ))}
+        </Grid>
       )}
-    </section>
+    </Section>
   );
 }

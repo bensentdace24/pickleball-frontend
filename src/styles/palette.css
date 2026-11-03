@@ -1,74 +1,58 @@
+/* ============================================
+   LEGACY PALETTE MAPPINGS
+   Maps old custom properties to new design tokens
+   for backward compatibility during migration
+   ============================================ */
+
 @theme {
-  --font-sans: "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  --text-xs: 0.8125rem;
-  --text-xs--line-height: 1.25rem;
+  /* Old ink/cream/mist palette → new neutral scale */
+  --color-ink-950: var(--color-neutral-50);
+  --color-ink-900: var(--color-neutral-100);
+  --color-ink-800: var(--color-neutral-200);
+  --color-ink-700: var(--color-neutral-300);
+  --color-ink-600: var(--color-neutral-400);
+  --color-ink-500: var(--color-neutral-500);
 
-  /* Pale aqua surfaces, deep teal copy, and the reference's pink accent. */
-  --color-ink-950: #effbfc;
-  --color-ink-900: #e4f8fa;
-  --color-ink-800: #ffffff;
-  --color-ink-700: #f5fcfd;
-  --color-ink-600: #c8e8eb;
-  --color-ink-500: #92cdd2;
+  --color-cream-50: var(--color-neutral-900);
+  --color-cream-100: var(--color-neutral-800);
+  --color-cream-200: var(--color-neutral-700);
+  --color-mist-300: var(--color-neutral-600);
+  --color-mist-400: var(--color-neutral-500);
+  --color-mist-500: var(--color-neutral-400);
+  --color-mist-600: var(--color-neutral-300);
 
-  --color-cream-50: #12343a;
-  --color-cream-100: #244c52;
-  --color-cream-200: #45666c;
-  --color-mist-300: #496b71;
-  --color-mist-400: #56777d;
-  --color-mist-500: #66848a;
-  --color-mist-600: #789398;
+  /* Old accent colors → new semantic colors */
+  --color-lemon-300: var(--color-primary-300);
+  --color-lemon-400: var(--color-primary-500);
+  --color-lemon-500: var(--color-primary-600);
+  --color-lemon-600: var(--color-primary-700);
+  --color-lemon-950: var(--color-primary-950);
 
-  --color-lemon-300: #f8b5d8;
-  --color-lemon-400: #ed5aa7;
-  --color-lemon-500: #e64b98;
-  --color-lemon-600: #9b1c5d;
-  --color-lemon-950: #33091e;
+  --color-lime-300: var(--color-success-600);
+  --color-lime-400: var(--color-success-500);
 
-  /* Status text stays dark enough to read on the new light surfaces. */
-  --color-lime-300: #247b43;
-  --color-lime-400: #188345;
-  --color-sky-300: #08717d;
-  --color-sky-400: #0a8795;
-  --color-amber-300: #875000;
-  --color-amber-400: #a65e00;
-  --color-rose-300: #a52242;
-  --color-rose-400: #b42346;
+  --color-sky-300: var(--color-primary-600);
+  --color-sky-400: var(--color-primary-500);
+  --color-sky-50: var(--color-primary-50);
+  --color-sky-100: var(--color-primary-100);
+  --color-sky-200: var(--color-primary-200);
+  --color-sky-500: var(--color-primary-400);
+  --color-sky-600: var(--color-primary-500);
+  --color-sky-700: var(--color-primary-600);
+  --color-sky-800: var(--color-primary-700);
+  --color-sky-900: var(--color-primary-800);
+  --color-sky-950: var(--color-primary-900);
 
-  --color-sky-50: #edfcfd;
-  --color-sky-100: #d3f6f8;
-  --color-sky-200: #a9ebef;
-  --color-sky-500: #0b9eac;
-  --color-sky-600: #087f8b;
-  --color-sky-700: #086a74;
-  --color-sky-800: #10555c;
-  --color-sky-900: #15464b;
-  --color-sky-950: #0c3035;
+  --color-amber-300: var(--color-warning-600);
+  --color-amber-400: var(--color-warning-500);
+
+  --color-rose-300: var(--color-danger-600);
+  --color-rose-400: var(--color-danger-500);
 }
 
-html,
-body {
-  background: var(--color-ink-950);
-  color: var(--color-cream-50);
-}
-
-* {
-  border-color: var(--color-ink-600);
-}
-
-/* Optional: tinted scrollbar so it doesn't glare */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-ink-950);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-ink-600);
-  border-radius: 999px;
-  border: 2px solid var(--color-ink-950);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-ink-500);
-}
+/* ============================================
+   COURT/ANIMATION STYLES — Moved to MiniCourt component
+   ============================================ */
+/* These styles were inline SVG/CSS animations in the old palette.css.
+   They are now handled in the MiniCourt.tsx component using CSS custom properties
+   and the new design token system. This file no longer contains court-specific styles. */
