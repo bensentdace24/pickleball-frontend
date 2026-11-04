@@ -18,10 +18,10 @@ interface Stat {
 }
 
 const accentConfig: Record<Stat["accent"], { dot: string; value: string; badge: string }> = {
-  live: { dot: "bg-primary-500", value: "text-primary-600 dark:text-primary-400", badge: "primary" },
-  open: { dot: "bg-success-500", value: "text-success-600 dark:text-success-400", badge: "success" },
-  warn: { dot: "bg-warning-500", value: "text-warning-600 dark:text-warning-400", badge: "warning" },
-  muted: { dot: "bg-neutral-400", value: "text-neutral-600 dark:text-neutral-400", badge: "default" },
+  live: { dot: "bg-primary-500", value: "text-primary", badge: "primary" },
+  open: { dot: "bg-success-500", value: "text-success", badge: "success" },
+  warn: { dot: "bg-warning-500", value: "text-warning", badge: "warning" },
+  muted: { dot: "bg-neutral-400", value: "text-text-tertiary", badge: "default" },
   total: { dot: "bg-neutral-400", value: "text-text-primary", badge: "default" },
 };
 
@@ -54,11 +54,11 @@ export function DashboardOverview({
                 className={`h-2 w-2 rounded-full ${config.dot}`}
                 aria-hidden="true"
               />
-              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <span className="text-label text-text-secondary">
                 {stat.label}
               </span>
             </div>
-            <p className="mt-2 text-2xl font-extrabold tabular-nums leading-none {config.value}">
+            <p className="mt-2 text-stat-sm font-bold tabular-nums leading-none {config.value} animate-count-up">
               {loading && stat.value === null ? (
                 <span className="inline-block h-6 w-8 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
               ) : (

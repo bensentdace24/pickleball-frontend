@@ -7,13 +7,12 @@ import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Alert } from "../components/Feedback";
 import { useAsync } from "../hooks/useAsync";
 import {
-  analyticsApi,
   courtsApi,
+  dashboardApi,
   gamesApi,
-  playersApi,
   queueApi,
 } from "../services/api";
-import type { Court, Game, QueueEntry } from "../types";
+import type { Game, QueueEntry } from "../types";
 import { AddToQueueForm } from "../components/admin/AddToQueueForm";
 import { useNavigate } from "react-router-dom";
 import { FinishGameModal } from "../components/admin/FinishGameModal";
@@ -30,7 +29,7 @@ import { AdminHeader } from "../components/admin/AdminHeader";
 import { DashboardOverview } from "../components/admin/DashboardOverview";
 import { Page, Container, Section, Flex, Badge } from "../components";
 
-const POLL_MS = 5000;
+const POLL_MS = 30000; // 30 seconds for real-time admin dashboard
 
 interface Notice {
   type: "success" | "error";
@@ -38,12 +37,14 @@ interface Notice {
 }
 
 export default function AdminDashboard() {
-  const courts = useAsync(courtsApi.list, POLL_MS);
-  const queue = useAsync(queueApi.list, POLL_MS);
-  const games = useAsync(() => gamesApi.list("playing"), POLL_MS);
-  const players = useAsync(playersApi.list, POLL_MS);
-  const analytics = useAsync(analyticsApi.get, POLL_MS);
-  const upNext = useAsync(matchupsApi.list, POLL_MS);
+  const dashboard = useAsync(dashboardApi.get, POLL_MS);
+  const snapshot = dashboard.data;
+  const courts = snapshot?.courts ?? null;
+  const queue = snapshot?.queue ?? null;
+  const games = snapshot?.games ?? null;
+  const players = snapshot?.players ?? null;
+  const matchups = snapshot?.matchups ?? null;
+  const pending = snapshot?.pending ?? null;
 
   const [approveTarget, setApproveTarget] = useState<QueueEntry | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -54,12 +55,10 @@ export default function AdminDashboard() {
   const [formMatchup, setFormMatchup] = useState(false);
   const [qrFor, setQrFor] = useState<Player | null>(null);
 
-  const pending = useAsync(queueApi.pending, POLL_MS);
-
-  const availableCourts = (courts.data ?? []).filter(
+  const availableCourts = (courts ?? []).filter(
     (c) => c.status === "available",
   );
-  const eligible = queue.data ?? [];
+  const eligible = queue ?? [];
   const canAssign = availableCourts.length > 0 && eligible.length >= 2;
 
   async function run(
@@ -71,14 +70,14 @@ export default function AdminDashboard() {
     try {
       await action();
       setNotice({ type: "success", text: success });
-      await refreshAll();
+      void refreshAll();
       return true;
     } catch (e) {
       setNotice({
         type: "error",
         text: e instanceof Error ? e.message : "Something went wrong.",
       });
-      await refreshAll();
+      void refreshAll();
       return false;
     } finally {
       setBusy(false);
@@ -206,23 +205,9 @@ export default function AdminDashboard() {
     );
   }
 
-  const refreshError =
-    courts.error ??
-    queue.error ??
-    games.error ??
-    players.error ??
-    analytics.error;
+  const refreshError = dashboard.error;
 
-  const refreshAll = () =>
-    Promise.all([
-      courts.refresh(),
-      queue.refresh(),
-      games.refresh(),
-      players.refresh(),
-      analytics.refresh(),
-      upNext.refresh(),
-      pending.refresh(),
-    ]);
+  const refreshAll = () => dashboard.refresh();
 
   const navigate = useNavigate();
   const staff = getUser();
@@ -237,15 +222,15 @@ export default function AdminDashboard() {
     navigate("/login", { replace: true });
   }
 
-  const pendingCount = pending.data?.length ?? 0;
+  const pendingCount = pending?.length ?? 0;
 
   return (
     <Page withBackground>
       <AdminHeader
         active="dashboard"
         staffName={staff?.name}
-        activeMatches={games.data?.length ?? 0}
-        syncIntervalSeconds={5}
+        activeMatches={games?.length ?? 0}
+        syncIntervalSeconds={POLL_MS / 1000}
         onLogout={logout}
       />
 
@@ -262,26 +247,20 @@ export default function AdminDashboard() {
 
           {/* Stat strip — the first thing the eye lands on */}
           <DashboardOverview
-            players={players.data?.length ?? null}
+            players={players?.length ?? null}
             waiting={
-              queue.data?.filter(
+              queue?.filter(
                 (e) => e.status === "waiting" || e.status === "called",
               ).length ?? null
             }
-            activeGames={games.data?.length ?? null}
+            activeGames={games?.length ?? null}
             availableCourts={availableCourts.length}
             maintenanceCourts={
-              courts.data?.filter((c) => c.status === "maintenance").length ??
+              courts?.filter((c) => c.status === "maintenance").length ??
               null
             }
-            completedGames={analytics.data?.total_games ?? null}
-            loading={
-              players.loading ||
-              analytics.loading ||
-              courts.loading ||
-              queue.loading ||
-              games.loading
-            }
+            completedGames={snapshot?.completed_games ?? null}
+            loading={dashboard.loading}
           />
 
           {/* Pending approvals */}
@@ -292,16 +271,16 @@ export default function AdminDashboard() {
               className="border-warning-200 bg-warning-50 dark:border-warning-800 dark:bg-warning-900/20"
             >
               <ul className="grid gap-2 sm:grid-cols-2">
-                {pending.data!.map((entry) => (
+                {pending!.map((entry) => (
                   <li
                     key={entry.id}
-                    className="rounded-xl border border-warning-200 bg-white p-3 sm:p-4 dark:border-warning-800 dark:bg-neutral-900"
+                    className="rounded-xl border border-warning-200 bg-surface-card p-3 sm:p-4 dark:border-warning-800 dark:bg-neutral-900"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-text-primary">
                         {entry.player?.name}
                         {entry.player?.phone && (
-                          <span className="ml-2 text-xs text-text-tertiary">
+                          <span className="ml-2 text-label text-text-tertiary">
                             {entry.player.phone}
                           </span>
                         )}
@@ -332,14 +311,14 @@ export default function AdminDashboard() {
                     {entry.possible_matches &&
                       entry.possible_matches.length > 0 && (
                         <div className="mt-2 rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-2 dark:border-primary-800 dark:bg-primary-900/20">
-                          <p className="text-[0.68rem] font-bold uppercase tracking-wider text-primary-700 dark:text-primary-400">
+                          <p className="text-label font-bold uppercase tracking-wider text-primary-700 dark:text-primary-400">
                             Possible match
                           </p>
                           <ul className="mt-1.5 space-y-1.5">
                             {entry.possible_matches.map((m) => (
                               <li
                                 key={m.id}
-                                className="flex flex-wrap items-center justify-between gap-2 text-xs text-primary-900 dark:text-primary-300"
+                                className="flex flex-wrap items-center justify-between gap-2 text-body text-primary-900 dark:text-primary-300"
                               >
                                 <span>
                                   {m.name}
@@ -352,7 +331,7 @@ export default function AdminDashboard() {
                                     {m.wins}W-{m.losses}L-{m.draws}D
                                   </span>
                                   {m.active_status && (
-                                    <span className="ml-1 font-semibold text-danger-600 dark:text-danger-400">
+                                    <span className="ml-1 font-semibold text-danger dark:text-danger">
                                       · already {m.active_status}
                                     </span>
                                   )}
@@ -378,28 +357,15 @@ export default function AdminDashboard() {
 
           {/* Courts — the hero of the page */}
           <CourtsSection
-            courts={courts.data}
-            loading={courts.loading}
+            courts={courts}
+            loading={dashboard.loading}
             busy={busy}
             canAssign={canAssign}
-            nextMatchup={upNext.data?.[0] ?? null}
             onAssign={openAssign}
-            onStartUpNext={(matchup, courtId) =>
-              handleStartMatchup(matchup, courtId)
-            }
-            onFinishGame={setFinishTarget}
             onScoreChange={(gameId, side, change) =>
               run(
                 () => gamesApi.updateScore(gameId, side, change),
                 "Score updated.",
-              )
-            }
-            onSetStatus={(court: Court, status) =>
-              run(
-                () => courtsApi.setStatus(court.id, status),
-                status === "maintenance"
-                  ? `${court.name} is on maintenance.`
-                  : `${court.name} is available.`,
               )
             }
             onAddCourt={(name) =>
@@ -425,8 +391,8 @@ export default function AdminDashboard() {
           </Section>
 
           <UpNextSection
-            matchups={upNext.data}
-            loading={upNext.loading}
+            matchups={matchups}
+            loading={dashboard.loading}
             busy={busy}
             canStart={availableCourts.length > 0}
             onFormMatchup={() => setFormMatchup(true)}
@@ -437,16 +403,16 @@ export default function AdminDashboard() {
 
           <Section className="grid gap-5 lg:grid-cols-2">
             <QueueSection
-              entries={queue.data}
-              loading={queue.loading}
+              entries={queue}
+              loading={dashboard.loading}
               busy={busy}
               canAssign={canAssign}
               onAssign={() => openAssign(null)}
               onCancel={setCancelTarget}
             />
             <ActiveGamesSection
-              games={games.data}
-              loading={games.loading}
+              games={games}
+              loading={dashboard.loading}
               busy={busy}
               onFinish={setFinishTarget}
             />

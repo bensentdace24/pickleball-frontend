@@ -1,7 +1,17 @@
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/500.css";
+@import "@fontsource/plus-jakarta-sans/600.css";
+@import "@fontsource/plus-jakarta-sans/700.css";
+@import "@fontsource/plus-jakarta-sans/800.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
 @theme {
   /* ============================================
      SPORTY COLOR SYSTEM — Pickleball-inspired palette
-     Court Green (primary), Ball Yellow (accent), Sky Blue (secondary)
+     Court Green (primary actions), Ball Yellow/Amber (Team B, warnings), Sky Blue (Team A, info), Red (destructive only)
      ============================================ */
 
   /* Neutral / Slate — backgrounds, text, borders */
@@ -17,33 +27,33 @@
   --color-neutral-900: #0f172a;
   --color-neutral-950: #020617;
 
-  /* Primary — Court Green: trust, nature, the sport */
-  --color-primary-50: #ecfdf5;
-  --color-primary-100: #d1fae5;
-  --color-primary-200: #a7f3d0;
-  --color-primary-300: #6ee7b7;
-  --color-primary-400: #34d399;
-  --color-primary-500: #10b981;
-  --color-primary-600: #059669;
-  --color-primary-700: #047857;
-  --color-primary-800: #065f46;
-  --color-primary-900: #064e3b;
-  --color-primary-950: #022c22;
+  /* Primary — Court Green: trust, nature, the sport — PRIMARY ACTIONS ONLY */
+  --color-primary-50: #ecfdf3;
+  --color-primary-100: #cfffe0;
+  --color-primary-200: #9ff9b8;
+  --color-primary-300: #5ce88a;
+  --color-primary-400: #22d367;
+  --color-primary-500: #10c95a;  /* Vibrant pickleball green */
+  --color-primary-600: #0aa64c;
+  --color-primary-700: #08873d;
+  --color-primary-800: #076b33;
+  --color-primary-900: #06562c;
+  --color-primary-950: #032d16;
 
-  /* Accent — Ball Yellow/Orange: energy, attention, the ball */
-  --color-accent-50: #fffbeb;
-  --color-accent-100: #fef3c7;
-  --color-accent-200: #fde68a;
-  --color-accent-300: #fcd34d;
-  --color-accent-400: #fbbf24;
-  --color-accent-500: #f59e0b;
-  --color-accent-600: #d97706;
-  --color-accent-700: #b45309;
-  --color-accent-800: #92400e;
-  --color-accent-900: #78350f;
-  --color-accent-950: #451a03;
+  /* Accent — Ball Amber/Orange: energy, attention — TEAM B + WARNINGS */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
 
-  /* Secondary — Sky Blue: fresh, open, outdoor feel */
+  /* Secondary — Sky Blue: fresh, open — TEAM A + INFO */
   --color-sky-50: #f0f9ff;
   --color-sky-100: #e0f2fe;
   --color-sky-200: #bae6fd;
@@ -56,7 +66,7 @@
   --color-sky-900: #0c4a6e;
   --color-sky-950: #082f49;
 
-  /* Success — Court Green */
+  /* Success — Court Green (alias) */
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
   --color-success-200: #a7f3d0;
@@ -68,7 +78,7 @@
   --color-success-800: #065f46;
   --color-success-900: #064e3b;
 
-  /* Warning — Ball Yellow */
+  /* Warning — Ball Amber (alias) */
   --color-warning-50: #fffbeb;
   --color-warning-100: #fef3c7;
   --color-warning-200: #fde68a;
@@ -80,7 +90,7 @@
   --color-warning-800: #92400e;
   --color-warning-900: #78350f;
 
-  /* Danger — Red for errors */
+  /* Danger — Red for DESTRUCTIVE ACTIONS ONLY */
   --color-danger-50: #fef2f2;
   --color-danger-100: #fee2e2;
   --color-danger-200: #fecaca;
@@ -92,7 +102,7 @@
   --color-danger-800: #991b1b;
   --color-danger-900: #7f1d1d;
 
-  /* Info — Sky Blue */
+  /* Info — Sky Blue (alias) */
   --color-info-50: #f0f9ff;
   --color-info-100: #e0f2fe;
   --color-info-200: #bae6fd;
@@ -116,9 +126,14 @@
   --color-surface-card: var(--color-neutral-50);
   --color-surface-card-hover: var(--color-neutral-100);
 
-  /* Background Mesh (for premium feel) */
+  /* Background Hero — Deep court navy with green glow + sky lines */
+  --color-bg-hero: #05101e;
+  --color-bg-hero-glow: rgba(16, 201, 90, 0.18);  /* Green glow */
+  --color-bg-hero-lines: rgba(14, 165, 233, 0.12);
+
+  /* Background Mesh (vibrant sporty washes) */
   --color-bg-mesh-primary: var(--color-primary-100);
-  --color-bg-mesh-accent: var(--color-accent-100);
+  --color-bg-mesh-accent: var(--color-amber-100);
   --color-bg-mesh-sky: var(--color-sky-100);
 
   /* Borders */
@@ -136,30 +151,49 @@
   --color-text-link: var(--color-primary-600);
   --color-text-link-hover: var(--color-primary-700);
   --color-text-on-primary: var(--color-neutral-50);
-  --color-text-on-accent: var(--color-neutral-900);
+  --color-text-on-amber: var(--color-neutral-900);
   --color-text-on-sky: var(--color-neutral-900);
 
-  /* Interactive */
+  /* Team colors — SEMANTIC, never used for anything else */
+  --color-team-a: var(--color-sky-500);
+  --color-team-a-bg: var(--color-sky-50);
+  --color-team-a-text: var(--color-sky-900);
+  --color-team-a-border: var(--color-sky-200);
+
+  --color-team-b: var(--color-amber-500);
+  --color-team-b-bg: var(--color-amber-50);
+  --color-team-b-text: var(--color-amber-900);
+  --color-team-b-border: var(--color-amber-200);
+
+  /* Interactive — Primary actions (Court Green) */
   --color-interactive-bg: var(--color-primary-600);
   --color-interactive-bg-hover: var(--color-primary-700);
   --color-interactive-bg-active: var(--color-primary-800);
   --color-interactive-text: var(--color-neutral-50);
 
-  --color-interactive-accent-bg: var(--color-accent-600);
-  --color-interactive-accent-bg-hover: var(--color-accent-700);
-  --color-interactive-accent-bg-active: var(--color-accent-800);
-  --color-interactive-accent-text: var(--color-neutral-900);
-
+  /* Interactive — Secondary actions (Sky Blue) */
   --color-interactive-sky-bg: var(--color-sky-600);
   --color-interactive-sky-bg-hover: var(--color-sky-700);
   --color-interactive-sky-bg-active: var(--color-sky-800);
   --color-interactive-sky-text: var(--color-neutral-50);
 
+  /* Interactive — Accent/Warning (Ball Amber) */
+  --color-interactive-amber-bg: var(--color-amber-600);
+  --color-interactive-amber-bg-hover: var(--color-amber-700);
+  --color-interactive-amber-bg-active: var(--color-amber-800);
+  --color-interactive-amber-text: var(--color-neutral-900);
+
+  /* Interactive — Destructive (Red) */
+  --color-interactive-danger-bg: var(--color-danger-600);
+  --color-interactive-danger-bg-hover: var(--color-danger-700);
+  --color-interactive-danger-bg-active: var(--color-danger-800);
+  --color-interactive-danger-text: var(--color-neutral-50);
+
   /* Status backgrounds (for badges, pills) */
-  --color-status-pending-bg: var(--color-warning-100);
-  --color-status-pending-text: var(--color-warning-800);
-  --color-status-waiting-bg: var(--color-warning-100);
-  --color-status-waiting-text: var(--color-warning-800);
+  --color-status-pending-bg: var(--color-amber-100);
+  --color-status-pending-text: var(--color-amber-800);
+  --color-status-waiting-bg: var(--color-amber-100);
+  --color-status-waiting-text: var(--color-amber-800);
   --color-status-called-bg: var(--color-primary-100);
   --color-status-called-text: var(--color-primary-800);
   --color-status-playing-bg: var(--color-primary-100);
@@ -170,8 +204,16 @@
   --color-status-cancelled-text: var(--color-danger-800);
   --color-status-available-bg: var(--color-success-100);
   --color-status-available-text: var(--color-success-800);
-  --color-status-maintenance-bg: var(--color-warning-100);
-  --color-status-maintenance-text: var(--color-warning-800);
+  --color-status-maintenance-bg: var(--color-amber-100);
+  --color-status-maintenance-text: var(--color-amber-800);
+
+  /* Court card specific */
+  --color-court-available-bg: var(--color-sky-50);
+  --color-court-available-border: var(--color-sky-200);
+  --color-court-playing-bg: var(--color-surface-card);
+  --color-court-playing-border: var(--color-primary-200);
+  --color-court-maintenance-bg: var(--color-amber-50);
+  --color-court-maintenance-border: var(--color-amber-200);
 
   /* Explicit dark theme via data attribute */
   --color-surface-dark: var(--color-neutral-900);
@@ -181,9 +223,9 @@
   --color-surface-card-dark: var(--color-neutral-800);
   --color-surface-card-hover-dark: var(--color-neutral-700);
 
-  --color-bg-mesh-primary-dark: rgba(16, 185, 129, 0.08);
-  --color-bg-mesh-accent-dark: rgba(245, 158, 11, 0.08);
-  --color-bg-mesh-sky-dark: rgba(14, 165, 233, 0.06);
+  --color-bg-mesh-primary-dark: rgba(16, 201, 90, 0.12);
+  --color-bg-mesh-accent-dark: rgba(245, 158, 11, 0.1);
+  --color-bg-mesh-sky-dark: rgba(14, 165, 233, 0.08);
 
   --color-border-dark: var(--color-neutral-700);
   --color-border-strong-dark: var(--color-neutral-600);
@@ -200,43 +242,85 @@
   --color-interactive-bg-hover-dark: var(--color-primary-500);
   --color-interactive-bg-active-dark: var(--color-primary-700);
 
+  /* Team colors dark */
+  --color-team-a-dark: var(--color-sky-400);
+  --color-team-a-bg-dark: var(--color-sky-900/30);
+  --color-team-a-text-dark: var(--color-sky-200);
+  --color-team-a-border-dark: var(--color-sky-800);
+
+  --color-team-b-dark: var(--color-amber-400);
+  --color-team-b-bg-dark: var(--color-amber-900/30);
+  --color-team-b-text-dark: var(--color-amber-200);
+  --color-team-b-border-dark: var(--color-amber-800);
+
+  --color-court-available-bg-dark: var(--color-sky-900/30);
+  --color-court-available-border-dark: var(--color-sky-800);
+  --color-court-playing-bg-dark: var(--color-neutral-800);
+  --color-court-playing-border-dark: var(--color-primary-800);
+  --color-court-maintenance-bg-dark: var(--color-amber-900/30);
+  --color-court-maintenance-border-dark: var(--color-amber-800);
+
   /* ============================================
-     TYPOGRAPHY SCALE — Swiss: Inter + JetBrains Mono
+     TYPOGRAPHY SCALE — Plus Jakarta Sans (UI) + JetBrains Mono (timers, scores, queue numbers)
      ============================================ */
-  --font-sans: "Inter", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --text-display: 3rem;
+  /* Page title: 28-36px/800 */
+  --text-display: 2.25rem; /* 36px */
   --text-display--line-height: 1.1;
-  --text-display--font-weight: 700;
+  --text-display--font-weight: 800;
 
-  --text-h1: 2.25rem;
+  /* Section title: 20px/700 */
+  --text-h1: 1.5rem; /* 24px */
   --text-h1--line-height: 1.2;
   --text-h1--font-weight: 700;
 
-  --text-h2: 1.5rem;
+  --text-h2: 1.25rem; /* 20px */
   --text-h2--line-height: 1.3;
-  --text-h2--font-weight: 600;
+  --text-h2--font-weight: 700;
 
-  --text-h3: 1.25rem;
+  /* Card title: 16px/700 */
+  --text-h3: 1rem; /* 16px */
   --text-h3--line-height: 1.4;
-  --text-h3--font-weight: 600;
+  --text-h3--font-weight: 700;
 
-  --text-body: 1rem;
-  --text-body--line-height: 1.6;
-  --text-body--font-weight: 400;
+  /* Body: 14-15px/500 */
+  --text-body: 0.9375rem; /* 15px */
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 500;
 
-  --text-small: 0.875rem;
+  /* Label: 12-13px/600 uppercase with letter-spacing */
+  --text-label: 0.8125rem; /* 13px */
+  --text-label--line-height: 1.4;
+  --text-label--font-weight: 600;
+  --text-label--letter-spacing: 0.08em;
+  --text-label--text-transform: uppercase;
+
+  --text-small: 0.875rem; /* 14px */
   --text-small--line-height: 1.5;
-  --text-small--font-weight: 400;
+  --text-small--font-weight: 500;
 
-  --text-tiny: 0.75rem;
+  --text-tiny: 0.75rem; /* 12px */
   --text-tiny--line-height: 1.4;
-  --text-tiny--font-weight: 500;
+  --text-tiny--font-weight: 600;
 
-  --text-mono: 0.875rem;
+  /* Big stat numbers: 28-40px/800 with tabular numbers */
+  --text-stat-sm: 1.75rem; /* 28px */
+  --text-stat-sm--line-height: 1.1;
+  --text-stat-sm--font-weight: 800;
+
+  --text-stat: 2.5rem; /* 40px */
+  --text-stat--line-height: 1.1;
+  --text-stat--font-weight: 800;
+
+  --text-mono: 0.875rem; /* 14px */
   --text-mono--line-height: 1.5;
-  --text-mono--font-weight: 400;
+  --text-mono--font-weight: 500;
+
+  --text-mono-lg: 1.25rem; /* 20px */
+  --text-mono-lg--line-height: 1.2;
+  --text-mono-lg--font-weight: 600;
 
   /* ============================================
      SPACING SCALE (4px base)
@@ -321,6 +405,14 @@
     linear-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgb(255 255 255 / 0.03) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+/* Court line pattern - subtle dotted lines like a pickleball court */
+.bg-court-lines {
+  background-image:
+    linear-gradient(90deg, var(--color-bg-hero-lines) 1px, transparent 1px),
+    linear-gradient(var(--color-bg-hero-lines) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 /* Noise/grain overlay */
@@ -412,4 +504,81 @@
   --color-interactive-bg: var(--color-primary-600);
   --color-interactive-bg-hover: var(--color-primary-700);
   --color-interactive-bg-active: var(--color-primary-800);
+}
+
+/* ============================================
+   TYPOGRAPHY UTILITY CLASSES
+   ============================================ */
+
+.text-display {
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  font-weight: var(--text-display--font-weight);
+  font-family: var(--font-sans);
+}
+
+.text-h1 {
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  font-weight: var(--text-h1--font-weight);
+  font-family: var(--font-sans);
+}
+
+.text-h2 {
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  font-weight: var(--text-h2--font-weight);
+  font-family: var(--font-sans);
+}
+
+.text-h3 {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  font-weight: var(--text-h3--font-weight);
+  font-family: var(--font-sans);
+}
+
+.text-body {
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  font-weight: var(--text-body--font-weight);
+  font-family: var(--font-sans);
+}
+
+.text-label {
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: var(--text-label--font-weight);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: var(--text-label--text-transform);
+  font-family: var(--font-sans);
+}
+
+.text-stat {
+  font-size: var(--text-stat);
+  line-height: var(--text-stat--line-height);
+  font-weight: var(--text-stat--font-weight);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-stat-sm {
+  font-size: var(--text-stat-sm);
+  line-height: var(--text-stat-sm--line-height);
+  font-weight: var(--text-stat-sm--font-weight);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-mono {
+  font-size: var(--text-mono);
+  line-height: var(--text-mono--line-height);
+  font-weight: var(--text-mono--font-weight);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Max line length 70 characters */
+.max-w-prose {
+  max-width: 70ch;
 }

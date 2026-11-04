@@ -68,7 +68,7 @@ export function UpNextSection({
       ) : (
         <div className="space-y-3">
           {matchups.map((m, i) => (
-            <Card key={m.id} variant="bordered" className="p-3">
+            <Card key={m.id} variant="bordered" className="p-4">
               <div className="flex items-center justify-between">
                 <Badge variant="info" size="sm">
                   {i === 0 ? "Up Next" : `Up Next #${i + 1}`}
@@ -79,33 +79,29 @@ export function UpNextSection({
               </div>
 
               {m.skill_warning && (
-                <div className="mt-2 rounded-md bg-warning-50 border border-warning-200 px-2 py-1 text-xs font-medium text-warning-800 dark:bg-warning-900/30 dark:border-warning-800 dark:text-warning-400">
+                <div className="mt-2 rounded-lg border border-warning-200 bg-warning-50 px-3 py-2 text-label font-medium text-warning dark:bg-warning-900/30 dark:border-warning-800 dark:text-warning">
                   ⚠ {m.skill_warning}
                 </div>
               )}
 
               {formatWait(m.estimated_minutes) && (
-                <p className="mt-1 text-xs text-text-secondary">
+                <p className="mt-1 text-body text-text-secondary">
                   Est. start: {formatWait(m.estimated_minutes)}
                 </p>
               )}
 
-              <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-md bg-primary-50 px-2 py-1.5 dark:bg-primary-900/20">
-                  <p className="font-semibold text-primary-900 dark:text-primary-400">Team A</p>
-                  <p className="text-primary-800 dark:text-primary-300">
-                    {m.team_a.map((p) => p.name).join(", ")}
-                  </p>
-                </div>
-                <div className="rounded-md bg-warning-50 px-2 py-1.5 dark:bg-warning-900/20">
-                  <p className="font-semibold text-warning-900 dark:text-warning-400">Team B</p>
-                  <p className="text-warning-800 dark:text-warning-300">
-                    {m.team_b.map((p) => p.name).join(", ")}
-                  </p>
-                </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <Card variant="sunken" className="p-3 border-team-a">
+                  <p className="text-label text-team-a">Team A</p>
+                  <p className="mt-1 font-medium text-text-primary">{m.team_a.map((p) => p.name).join(", ")}</p>
+                </Card>
+                <Card variant="sunken" className="p-3 border-team-b">
+                  <p className="text-label text-team-b">Team B</p>
+                  <p className="mt-1 font-medium text-text-primary">{m.team_b.map((p) => p.name).join(", ")}</p>
+                </Card>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 {i === 0 ? (
                   <Button
                     size="sm"
@@ -115,7 +111,7 @@ export function UpNextSection({
                     {canStart ? "Start Next" : "No court free yet"}
                   </Button>
                 ) : (
-                  <span className="text-xs text-text-tertiary">
+                  <span className="text-label text-text-tertiary">
                     Waiting behind Up Next
                   </span>
                 )}

@@ -12,17 +12,17 @@ interface AlertProps {
 }
 
 const alertIcons: Record<AlertType, ReactNode> = {
-  success: <CheckCircle className="h-5 w-5 text-court-green-600 dark:text-court-green-400" aria-hidden="true" />,
+  success: <CheckCircle className="h-5 w-5 text-primary-600 dark:text-primary-400" aria-hidden="true" />,
   error: <AlertCircle className="h-5 w-5 text-danger-600 dark:text-danger-400" aria-hidden="true" />,
-  warning: <AlertCircle className="h-5 w-5 text-ball-yellow-600 dark:text-ball-yellow-400" aria-hidden="true" />,
-  info: <Info className="h-5 w-5 text-sky-blue-600 dark:text-sky-blue-400" aria-hidden="true" />,
+  warning: <AlertCircle className="h-5 w-5 text-warning-600 dark:text-warning-400" aria-hidden="true" />,
+  info: <Info className="h-5 w-5 text-info-600 dark:text-info-400" aria-hidden="true" />,
 };
 
 const alertStyles: Record<AlertType, string> = {
-  success: "bg-court-green-50 border-court-green-200 text-court-green-800 dark:bg-court-green-900/20 dark:border-court-green-800 dark:text-court-green-400",
+  success: "bg-primary-50 border-primary-200 text-primary-800 dark:bg-primary-900/20 dark:border-primary-800 dark:text-primary-400",
   error: "bg-danger-50 border-danger-200 text-danger-800 dark:bg-danger-900/20 dark:border-danger-800 dark:text-danger-400",
-  warning: "bg-ball-yellow-50 border-ball-yellow-200 text-ball-yellow-800 dark:bg-ball-yellow-900/20 dark:border-ball-yellow-800 dark:text-ball-yellow-400",
-  info: "bg-sky-blue-50 border-sky-blue-200 text-sky-blue-800 dark:bg-sky-blue-900/20 dark:border-sky-blue-800 dark:text-sky-blue-400",
+  warning: "bg-warning-50 border-warning-200 text-warning-800 dark:bg-warning-900/20 dark:border-warning-800 dark:text-warning-400",
+  info: "bg-info-50 border-info-200 text-info-800 dark:bg-info-900/20 dark:border-info-800 dark:text-info-400",
 };
 
 const alertRoles: Record<AlertType, "alert" | "status"> = {
@@ -86,7 +86,7 @@ export function Spinner({ label = "Loading…", size = "md", className = "" }: S
           fill="none"
         />
         <circle
-          className="text-court-green-600 animate-spin"
+          className="text-primary-600 animate-spin"
           cx="12"
           cy="12"
           r="10"
@@ -120,6 +120,18 @@ export function EmptyState({ title, description, action, icon, className = "" }:
       </div>
       {action && <div className="mt-4">{action}</div>}
     </div>
+  );
+}
+
+export function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`
+        skeleton rounded
+        ${className}
+      `}
+      aria-hidden="true"
+    />
   );
 }
 

@@ -22,7 +22,7 @@ export function Table({
     <div className="overflow-x-auto">
       <table
         className={`
-          w-full text-left text-sm font-mono
+          w-full text-left text-body font-mono
           ${bordered ? "border border-border" : "border-collapse"}
           ${className}
         `}
@@ -45,7 +45,7 @@ export function TableHeader({ children, sticky = false, className = "", ...props
     <thead
       className={`
         bg-surface-elevated border-b border-border
-        ${sticky ? "sticky top-0 z-[var(--z-sticky)]" : ""}
+        ${sticky ? "sticky top-0 z-sticky" : ""}
         ${className}
       `}
       {...props}
@@ -84,8 +84,8 @@ export function TableRow({
     <tr
       className={`
         transition-colors duration-fast
-        ${selected ? "bg-court-green-50 dark:bg-court-green-900/20" : ""}
-        ${hoverable && !selected ? "hover:bg-surface-sunken hover:border-l-4 hover:border-court-green-500" : ""}
+        ${selected ? "bg-primary-50 dark:bg-primary-900/20" : ""}
+        ${hoverable && !selected ? "hover:bg-surface-sunken hover:border-l-4 hover:border-primary-500" : ""}
         ${clickable ? "cursor-pointer select-none" : ""}
         ${className}
       `}
@@ -115,7 +115,7 @@ export function TableHead({
       scope="col"
       style={{ width }}
       className={`
-        px-4 py-3 font-semibold text-text-secondary uppercase tracking-wider text-xs
+        px-4 py-3 font-semibold text-text-secondary uppercase tracking-wider text-label
         text-${align}
         ${className}
       `}
@@ -165,8 +165,8 @@ export function TableEmpty({ colSpan, title, description, action, className = ""
     <tr>
       <td colSpan={colSpan} className={`py-12 text-center ${className}`}>
         <div className="flex flex-col items-center gap-3">
-          <p className="text-lg font-medium text-text-primary">{title}</p>
-          {description && <p className="text-sm text-text-secondary">{description}</p>}
+          <p className="text-h3 font-medium text-text-primary">{title}</p>
+          {description && <p className="text-body text-text-secondary">{description}</p>}
           {action && <div className="mt-4">{action}</div>}
         </div>
       </td>

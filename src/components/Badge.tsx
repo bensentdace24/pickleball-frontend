@@ -7,8 +7,10 @@ type Variant =
   | "warning"
   | "danger"
   | "info"
-  | "accent"
   | "sky"
+  | "accent"
+  | "team-a"
+  | "team-b"
   | "pending"
   | "waiting"
   | "called"
@@ -30,33 +32,42 @@ export interface BadgeProps {
 }
 
 const variantStyles: Record<Variant, string> = {
-  default: "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
-  /* Court Green — primary brand, success states */
-  primary: "bg-court-green-100 text-court-green-800 dark:bg-court-green-900/30 dark:text-court-green-400",
-  success: "bg-court-green-100 text-court-green-800 dark:bg-court-green-900/30 dark:text-court-green-400",
-  /* Ball Yellow — attention, pending, warning */
-  warning: "bg-ball-yellow-100 text-ball-yellow-800 dark:bg-ball-yellow-900/30 dark:text-ball-yellow-400",
-  accent: "bg-ball-yellow-100 text-ball-yellow-800 dark:bg-ball-yellow-900/30 dark:text-ball-yellow-400",
-  /* Sky Blue — info, secondary actions */
-  info: "bg-sky-blue-100 text-sky-blue-800 dark:bg-sky-blue-900/30 dark:text-sky-blue-400",
-  sky: "bg-sky-blue-100 text-sky-blue-800 dark:bg-sky-blue-900/30 dark:text-sky-blue-400",
+  /* Default — neutral */
+  default: "bg-[var(--color-neutral-100)] text-[var(--color-neutral-700)] dark:bg-[var(--color-neutral-800)] dark:text-[var(--color-neutral-300)]",
+
+  /* Primary — Court Green: primary brand, success states */
+  primary: "bg-[var(--color-primary-100)] text-[var(--color-primary-800)] dark:bg-[var(--color-primary-900/30)] dark:text-[var(--color-primary-400)]",
+  success: "bg-[var(--color-primary-100)] text-[var(--color-primary-800)] dark:bg-[var(--color-primary-900/30)] dark:text-[var(--color-primary-400)]",
+
+  /* Warning — Ball Amber: attention, pending, warning */
+  warning: "bg-[var(--color-amber-100)] text-[var(--color-amber-800)] dark:bg-[var(--color-amber-900/30)] dark:text-[var(--color-amber-400)]",
+  accent: "bg-[var(--color-amber-100)] text-[var(--color-amber-800)] dark:bg-[var(--color-amber-900/30)] dark:text-[var(--color-amber-400)]",
+
+  /* Sky Blue — info, secondary actions, Team A */
+  info: "bg-[var(--color-sky-100)] text-[var(--color-sky-800)] dark:bg-[var(--color-sky-900/30)] dark:text-[var(--color-sky-400)]",
+  sky: "bg-[var(--color-sky-100)] text-[var(--color-sky-800)] dark:bg-[var(--color-sky-900/30)] dark:text-[var(--color-sky-400)]",
+  "team-a": "bg-[var(--color-team-a-bg)] text-[var(--color-team-a-text)] dark:bg-[var(--color-team-a-bg-dark)] dark:text-[var(--color-team-a-text-dark)]",
+
+  /* Team B — Ball Amber */
+  "team-b": "bg-[var(--color-team-b-bg)] text-[var(--color-team-b-text)] dark:bg-[var(--color-team-b-bg-dark)] dark:text-[var(--color-team-b-text-dark)]",
+
   /* Red — errors, destructive */
-  danger: "bg-danger-100 text-danger-800 dark:bg-danger-900/30 dark:text-danger-400",
+  danger: "bg-[var(--color-danger-100)] text-[var(--color-danger-800)] dark:bg-[var(--color-danger-900/30)] dark:text-[var(--color-danger-400)]",
 
   /* Status-specific aliases */
-  pending: "bg-ball-yellow-100 text-ball-yellow-800 dark:bg-ball-yellow-900/30 dark:text-ball-yellow-400",
-  waiting: "bg-ball-yellow-100 text-ball-yellow-800 dark:bg-ball-yellow-900/30 dark:text-ball-yellow-400",
-  called: "bg-court-green-100 text-court-green-800 dark:bg-court-green-900/30 dark:text-court-green-400",
-  playing: "bg-court-green-100 text-court-green-800 dark:bg-court-green-900/30 dark:text-court-green-400",
-  completed: "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
-  cancelled: "bg-danger-100 text-danger-800 dark:bg-danger-900/30 dark:text-danger-400",
-  available: "bg-court-green-100 text-court-green-800 dark:bg-court-green-900/30 dark:text-court-green-400",
-  maintenance: "bg-ball-yellow-100 text-ball-yellow-800 dark:bg-ball-yellow-900/30 dark:text-ball-yellow-400",
+  pending: "bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-text)]",
+  waiting: "bg-[var(--color-status-waiting-bg)] text-[var(--color-status-waiting-text)]",
+  called: "bg-[var(--color-status-called-bg)] text-[var(--color-status-called-text)]",
+  playing: "bg-[var(--color-status-playing-bg)] text-[var(--color-status-playing-text)]",
+  completed: "bg-[var(--color-status-completed-bg)] text-[var(--color-status-completed-text)]",
+  cancelled: "bg-[var(--color-status-cancelled-bg)] text-[var(--color-status-cancelled-text)]",
+  available: "bg-[var(--color-status-available-bg)] text-[var(--color-status-available-text)]",
+  maintenance: "bg-[var(--color-status-maintenance-bg)] text-[var(--color-status-maintenance-text)]",
 };
 
 const sizeStyles: Record<Size, string> = {
-  sm: "px-2 py-0.5 text-[0.65rem]",
-  md: "px-2.5 py-0.5 text-xs",
+  sm: "px-2 py-0.5 text-[0.6875rem] min-h-[24px]", /* 11px -> 12px for readability */
+  md: "px-2.5 py-0.5 text-[0.75rem] min-h-[26px]", /* 12px -> 13px for readability */
 };
 
 export function Badge({

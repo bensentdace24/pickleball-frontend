@@ -21,7 +21,7 @@ const Input = ((
         placeholder:text-text-tertiary
         bg-surface-card
         border-border
-        focus:border-court-green-500 focus:ring-2 focus:ring-court-green-500/20 focus:outline-none
+        focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none
         disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-60
         transition-colors duration-fast
         ${error ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20" : ""}
@@ -58,7 +58,7 @@ const Textarea = ((
         placeholder:text-text-tertiary
         bg-surface-card
         border-border
-        focus:border-court-green-500 focus:ring-2 focus:ring-court-green-500/20 focus:outline-none
+        focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none
         disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-60
         transition-colors duration-fast resize-y min-h-[80px]
         ${error ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20" : ""}
@@ -96,7 +96,7 @@ const Select = ((
         w-full rounded-lg border px-3 py-2 text-text-primary
         bg-surface-card
         border-border
-        focus:border-court-green-500 focus:ring-2 focus:ring-court-green-500/20 focus:outline-none
+        focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none
         disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-60
         transition-colors duration-fast
         appearance-none
@@ -138,8 +138,8 @@ export function Checkbox({ label, description, className = "", id, ...props }: C
         id={checkboxId}
         className={`
           mt-0.5 h-4 w-4 rounded border-border
-          text-court-green-600
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-court-green-500 focus-visible:ring-offset-2
+          text-primary-600
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
           disabled:cursor-not-allowed disabled:opacity-50
           transition-colors duration-fast
         `}
@@ -204,8 +204,8 @@ export function RadioGroup({
               onChange={() => onChange(option.value)}
               className={`
                 mt-0.5 h-4 w-4 border-border
-                text-court-green-600
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-court-green-500 focus-visible:ring-offset-2
+                text-primary-600
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
                 disabled:cursor-not-allowed disabled:opacity-50
                 transition-colors duration-fast
               `}

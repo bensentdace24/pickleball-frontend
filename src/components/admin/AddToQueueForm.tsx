@@ -109,14 +109,14 @@ export function AddToQueueForm({ busy, onJoin }: Props) {
       </div>
 
       {selected && (
-        <div className="rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-800 dark:bg-primary-900/20 dark:text-primary-300">
+        <div className="rounded-lg bg-primary-50 px-3 py-2 text-label text-primary-800 dark:bg-primary-900/20 dark:text-primary-300">
           <span className="font-semibold">{selected.player.name}</span>'s
           record: {selected.detail.stats.wins}W-
           {selected.detail.stats.losses}L-{selected.detail.stats.draws}D ·{" "}
           {selected.detail.stats.total_points} pts ·{" "}
           {selected.detail.stats.games_played} games
           {blockedByActiveQueue && (
-            <span className="ml-2 font-semibold text-danger-600 dark:text-danger-400">
+            <span className="ml-2 font-semibold text-danger dark:text-danger">
               ⚠ Already in queue ({selected.detail.current_status})
             </span>
           )}

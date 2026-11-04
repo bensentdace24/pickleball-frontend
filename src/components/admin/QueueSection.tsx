@@ -31,7 +31,7 @@ export function QueueSection({
       action={
         <div className="flex items-center gap-2">
           {entries && (
-            <Badge variant="info" className="text-xs">
+            <Badge variant="info" className="text-label">
               {entries.length} waiting
             </Badge>
           )}
@@ -71,7 +71,7 @@ export function QueueSection({
                       <span className="font-medium text-text-primary">
                         {entry.player?.name ?? "Unknown player"}
                       </span>
-                      <span className="text-xs text-text-tertiary">#{entry.queue_number}</span>
+                      <span className="text-label text-text-tertiary">#{entry.queue_number}</span>
                       {entry.player?.skill_level && (
                         <Badge variant="info" size="sm">
                           {entry.player.skill_level}
@@ -82,7 +82,7 @@ export function QueueSection({
                   <TableCell>
                     <StatusBadge status={entry.status} />
                   </TableCell>
-                  <TableCell className="text-sm text-text-secondary">
+                  <TableCell className="text-body text-text-secondary">
                     <div>
                       {entry.match_type === "any"
                         ? "Either format"

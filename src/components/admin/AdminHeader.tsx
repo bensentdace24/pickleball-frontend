@@ -45,11 +45,11 @@ export function AdminHeader({
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-surface-elevated/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-sticky border-b border-border bg-surface-elevated/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
         {/* Brand + live pill */}
         <Flex align="center" gap={3}>
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-600 text-sm font-black text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-black text-text-on-primary">
             P
           </span>
           <span className="hidden text-sm font-bold text-text-primary sm:block">
@@ -69,7 +69,7 @@ export function AdminHeader({
               key={link.id}
               href={link.href}
               aria-current={active === link.id ? "page" : undefined}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-label font-semibold transition-colors ${
                 active === link.id
                   ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
                   : "text-text-secondary hover:bg-surface-sunken hover:text-text-primary"
@@ -83,13 +83,13 @@ export function AdminHeader({
         {/* Right side */}
         <Flex align="center" gap={3}>
           {syncIntervalSeconds !== undefined && (
-            <Flex align="center" gap={1.5} className="hidden text-xs text-text-tertiary sm:flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success-500" aria-hidden="true" />
+            <Flex align="center" gap={1.5} className="hidden text-label text-text-tertiary sm:flex">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-500" aria-hidden="true" />
               {syncIntervalSeconds}s
             </Flex>
           )}
           {staffName && (
-            <span className="hidden max-w-[10ch] truncate text-xs font-semibold text-text-secondary sm:block">
+            <span className="hidden max-w-[10ch] truncate text-label font-semibold text-text-secondary sm:block">
               {staffName}
             </span>
           )}
@@ -99,7 +99,7 @@ export function AdminHeader({
             icon={<LogOut className="h-4 w-4" />}
             iconPosition="left"
             onClick={handleLogout}
-            className="text-text-secondary hover:text-danger-600 dark:hover:text-danger-400"
+            className="text-text-secondary hover:text-danger dark:hover:text-danger"
           >
             Sign out
           </Button>

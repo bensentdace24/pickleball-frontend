@@ -6,7 +6,7 @@ export { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Dia
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableEmpty, TableLoading } from "./Table";
 export { Input, Textarea, Select, Checkbox, RadioGroup, Field } from "./form/Input";
 export { Page, PageHeader, Section, Container, Grid, Flex, Stack, Inline } from "./layout/Page";
-export { Alert, Spinner, EmptyState, ToastProvider, useToast } from "./Feedback";
+export { Alert, Spinner, EmptyState, Skeleton, ToastProvider, useToast } from "./Feedback";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { MiniCourt } from "./MiniCourt";
 

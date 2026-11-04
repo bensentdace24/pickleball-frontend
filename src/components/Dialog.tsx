@@ -59,7 +59,7 @@ export function Dialog({
       {/* Sporty backdrop with mesh */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity
-          [background-image: radial-gradient(ellipse_80%_50%_at_50%_-20%,var(--color-bg-mesh-primary)_0%,transparent_50%),
+          [background-image:_radial-gradient(ellipse_80%_50%_at_50%_-20%,var(--color-bg-mesh-primary)_0%,transparent_50%),
           radial-gradient(ellipse_60%_40%_at_80%_100%,var(--color-bg-mesh-accent)_0%,transparent_50%),
           radial-gradient(ellipse_50%_30%_at_10%_60%,var(--color-bg-mesh-sky)_0%,transparent_50%)]"
         aria-hidden="true"
@@ -68,20 +68,20 @@ export function Dialog({
       <div
         className={`
           relative z-[var(--z-modal)] w-full ${sizeStyles[size]}
-          rounded-xl bg-surface-card border border-border shadow-xl
+          rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xl
           max-h-[90vh] overflow-hidden flex flex-col
-          animate-in fade-in-0 zoom-in-95 duration-spring
+          animate-modal-in
           ${className}
         `}
         {...{ "data-dialog-content": "" }}
       >
-        <header className="flex items-start justify-between gap-4 border-b border-border p-4 sm:p-5 bg-surface-elevated/50">
+        <header className="flex items-start justify-between gap-4 border-b border-[var(--color-border)] p-4 sm:p-5 bg-[var(--color-surface-elevated)/50]">
           <div>
-            <h2 id="dialog-title" className="text-lg font-semibold text-text-primary">
+            <h2 id="dialog-title" className="text-h3 text-[var(--color-text-primary)]">
               {title}
             </h2>
             {description && (
-              <p id="dialog-description" className="mt-1 text-sm text-text-secondary">
+              <p id="dialog-description" className="mt-1 text-small text-[var(--color-text-secondary)]">
                 {description}
               </p>
             )}
@@ -90,9 +90,9 @@ export function Dialog({
             type="button"
             onClick={onClose}
             className={`
-              flex-shrink-0 rounded-md p-1.5 text-text-tertiary
-              hover:bg-surface-sunken hover:text-text-primary
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-court-green-500
+              flex-shrink-0 rounded-md p-1.5 text-[var(--color-text-tertiary)]
+              hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)]
               transition-colors duration-fast
             `}
             aria-label="Close dialog"
@@ -119,7 +119,7 @@ export function DialogFooter({ children, className = "", ...props }: DialogFoote
     <footer
       className={`
         flex flex-wrap items-center justify-end gap-3
-        border-t border-border p-4 sm:p-5 bg-surface-elevated/50
+        border-t border-[var(--color-border)] p-4 sm:p-5 bg-[var(--color-surface-elevated)/50]
         ${className}
       `}
       {...props}
@@ -139,7 +139,7 @@ export function DialogTrigger({ children, onOpen }: DialogTriggerProps) {
     <button
       type="button"
       onClick={onOpen}
-      className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-court-green-500"
+      className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)]"
     >
       {children}
     </button>
@@ -148,15 +148,15 @@ export function DialogTrigger({ children, onOpen }: DialogTriggerProps) {
 
 /* Named exports for composite dialog pattern */
 export function DialogHeader({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <header className={`flex items-start justify-between gap-4 border-b border-border p-4 sm:p-5 ${className}`}>{children}</header>;
+  return <header className={`flex items-start justify-between gap-4 border-b border-[var(--color-border)] p-4 sm:p-5 ${className}`}>{children}</header>;
 }
 
 export function DialogTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <h2 id="dialog-title" className={`text-lg font-semibold text-text-primary ${className}`}>{children}</h2>;
+  return <h2 id="dialog-title" className={`text-h3 text-[var(--color-text-primary)] ${className}`}>{children}</h2>;
 }
 
 export function DialogDescription({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <p id="dialog-description" className={`mt-1 text-sm text-text-secondary ${className}`}>{children}</p>;
+  return <p id="dialog-description" className={`mt-1 text-small text-[var(--color-text-secondary)] ${className}`}>{children}</p>;
 }
 
 export function DialogClose({ onClose, className = "" }: { onClose: () => void; className?: string }) {
@@ -165,9 +165,9 @@ export function DialogClose({ onClose, className = "" }: { onClose: () => void; 
       type="button"
       onClick={onClose}
       className={`
-        flex-shrink-0 rounded-md p-1.5 text-text-tertiary
-        hover:bg-surface-sunken hover:text-text-primary
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-court-green-500
+        flex-shrink-0 rounded-md p-1.5 text-[var(--color-text-tertiary)]
+        hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)]
         transition-colors duration-fast
         ${className}
       `}

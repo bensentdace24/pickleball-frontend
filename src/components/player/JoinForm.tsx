@@ -100,7 +100,7 @@ export function JoinForm({ busy, onJoin }: Props) {
           </div>
         </Field>
 
-        <Button type="submit" disabled={busy || !name.trim()} className="w-full">
+        <Button type="submit" variant="primary" size="lg" disabled={busy || !name.trim()} className="w-full">
           {busy ? "Joining…" : "Join Queue"}
         </Button>
       </form>

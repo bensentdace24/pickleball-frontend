@@ -19,10 +19,10 @@ export function PlayerQrCode({ playerName, qrToken, onClose }: Props) {
       </DialogHeader>
 
       <div className="flex flex-col items-center gap-4">
-        <div className="rounded-lg border border-border p-4 bg-surface">
+        <div className="rounded-lg border border-border p-4 bg-surface-card">
           <QRCodeSVG value={url} size={200} />
         </div>
-        <p className="break-all text-xs text-text-tertiary">{url}</p>
+        <p className="break-all text-label text-text-tertiary">{url}</p>
 
         <DialogFooter>
           <Button className="w-full" onClick={onClose}>Done</Button>

@@ -3,6 +3,7 @@ import { http } from "./http";
 import type {
   ApiResponse,
   Analytics,
+  AdminDashboardSnapshot,
   AssignGamePayload,
   AuthUser,
   Court,
@@ -140,6 +141,10 @@ export const statusApi = {
 
 export const analyticsApi = {
   get: () => unwrap<Analytics>(http.get("/analytics")),
+};
+
+export const dashboardApi = {
+  get: () => unwrap<AdminDashboardSnapshot>(http.get("/dashboard")),
 };
 
 export const authApi = {

@@ -2,18 +2,20 @@ import type { ReactNode, HTMLAttributes } from "react";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  variant?: "default" | "elevated" | "sunken" | "bordered" | "mesh";
+  variant?: "default" | "elevated" | "sunken" | "bordered" | "court-available" | "court-playing" | "court-maintenance";
   padding?: "none" | "sm" | "md" | "lg";
   hover?: boolean;
 }
 
 const variantStyles = {
-  default: "bg-surface-card border border-border",
-  elevated: "bg-surface-elevated shadow-lg border border-border",
-  sunken: "bg-surface-sunken shadow-md border border-border",
-  bordered: "bg-surface-card border-2 border-border-strong",
-  /* Mesh gradient background for premium sporty feel */
-  mesh: "bg-gradient-to-br from-surface-card via-surface-card-hover to-surface-elevated shadow-xl border border-border/50",
+  default: "bg-[var(--color-surface-card)] border border-[var(--color-border)]",
+  elevated: "bg-[var(--color-surface-elevated)] shadow-lg border border-[var(--color-border)]",
+  sunken: "bg-[var(--color-surface-sunken)] shadow-md border border-[var(--color-border)]",
+  bordered: "bg-[var(--color-surface-card)] border-2 border-[var(--color-border-strong)]",
+  /* Court-specific variants with semantic colors */
+  "court-available": "bg-[var(--color-court-available-bg)] border border-[var(--color-court-available-border)]",
+  "court-playing": "bg-[var(--color-court-playing-bg)] border border-[var(--color-court-playing-border)]",
+  "court-maintenance": "bg-[var(--color-court-maintenance-bg)] border border-[var(--color-court-maintenance-border)]",
 };
 
 const paddingStyles = {
@@ -23,7 +25,7 @@ const paddingStyles = {
   lg: "p-5 sm:p-6",
 };
 
-const hoverStyles = "transition-all duration-normal hover:shadow-lg hover:border-border-strong hover:-translate-y-0.5";
+const hoverStyles = "transition-all duration-normal hover:shadow-lg hover:border-[var(--color-primary-300)] hover:-translate-y-0.5";
 
 export function Card({
   children,
@@ -73,8 +75,8 @@ interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 export function CardTitle({ children, subtitle, className = "", ...props }: CardTitleProps) {
   return (
     <div {...props}>
-      <h3 className={`text-lg font-semibold text-text-primary ${className}`}>{children}</h3>
-      {subtitle && <p className="mt-1 text-sm text-text-secondary">{subtitle}</p>}
+      <h3 className={`text-h3 text-[var(--color-text-primary)] ${className}`}>{children}</h3>
+      {subtitle && <p className="mt-1 text-small text-[var(--color-text-secondary)]">{subtitle}</p>}
     </div>
   );
 }

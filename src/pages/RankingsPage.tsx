@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { useAsync } from "../hooks/useAsync";
 import { rankingsApi } from "../services/api";
-import { EmptyState, Spinner, Alert } from "../components/Feedback";
+import { EmptyState, Alert, Skeleton } from "../components/Feedback";
 import { TierBadge } from "../components/TierBadge";
 import { Page, Card, Badge, Input, Flex, Grid, Button } from "../components";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/Table";
@@ -31,6 +31,65 @@ function SearchIcon() {
   );
 }
 
+function MetricCardSkeleton() {
+  return (
+    <Card variant="bordered" className="p-4 animate-pulse">
+      <Skeleton className="h-3 w-24 rounded mb-2" />
+      <Skeleton className="h-7 w-16 rounded" />
+    </Card>
+  );
+}
+
+function TopPlayerCardSkeleton() {
+  return (
+    <Card variant="bordered" className="p-5 animate-pulse">
+      <Flex justify="between">
+        <Skeleton className="h-5 w-16 rounded" />
+        <Skeleton className="h-5 w-20 rounded" />
+      </Flex>
+      <Skeleton className="h-6 w-32 rounded mt-4" />
+      <Skeleton className="h-4 w-40 rounded mt-2" />
+    </Card>
+  );
+}
+
+function TableSkeleton() {
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Rank</TableHead>
+            <TableHead>Player</TableHead>
+            <TableHead>Tier</TableHead>
+            <TableHead>Record</TableHead>
+            <TableHead className="min-w-[140px]">Win %</TableHead>
+            <TableHead>Point diff</TableHead>
+            <TableHead>Points</TableHead>
+            <TableHead>Avg Time</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <TableRow key={i} className="animate-pulse">
+              <TableCell><Skeleton className="h-4 w-12 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-32 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-20 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-24 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-20 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
 export default function RankingsPage() {
   const { data, loading, error } = useAsync(rankingsApi.list, 10000);
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,6 +108,13 @@ export default function RankingsPage() {
     });
   }, [data, searchTerm, selectedTier]);
 
+  // Dynamic tier list from data
+  const tierOptions = useMemo(() => {
+    if (!data) return ["All", "Pro", "Advanced", "Intermediate", "Beginner"];
+    const tiers = [...new Set(data.map((d) => d.tier).filter(Boolean))] as string[];
+    return ["All", ...tiers];
+  }, [data]);
+
   return (
     <Page withBackground>
       <AdminHeader active="rankings" />
@@ -56,50 +122,68 @@ export default function RankingsPage() {
       <main className="mx-auto max-w-7xl px-4 py-6">
         {/* Metric Cards Row */}
         <Grid cols={4} gap={4} className="mb-6 grid-cols-1 sm:grid-cols-2">
-          <Card variant="bordered" className="p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">Active Courts</p>
-            <p className="mt-2 text-2xl font-bold text-text-primary">4 <span className="text-base font-normal text-text-tertiary">/6</span></p>
-          </Card>
+          {loading && !data ? (
+            <>
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+            </>
+          ) : (
+            <>
+              <Card variant="bordered" className="p-4 hover-lift">
+                <p className="text-label text-text-secondary">Total Players</p>
+                <p className="mt-2 text-stat-sm font-bold text-text-primary animate-count-up">{data?.length ?? 0}</p>
+              </Card>
 
-          <Card variant="bordered" className="p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">Open Ready</p>
-            <p className="mt-2 text-2xl font-bold text-success-500">1</p>
-          </Card>
+              <Card variant="bordered" className="p-4 hover-lift">
+                <p className="text-label text-text-secondary">Active Tiers</p>
+                <p className="mt-2 text-stat-sm font-bold text-success animate-count-up">
+                  {tierOptions.length - 1}
+                </p>
+              </Card>
 
-          <Card variant="bordered" className="p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">Waiting Queue</p>
-            <p className="mt-2 text-2xl font-bold text-primary-500">2</p>
-          </Card>
+              <Card variant="bordered" className="p-4 hover-lift">
+                <p className="text-label text-text-secondary">Top Win Rate</p>
+                <p className="mt-2 text-stat-sm font-bold text-primary animate-count-up">
+                  {topThree[0] ? `${topThree[0].win_rate}%` : "—"}
+                </p>
+              </Card>
 
-          <Card variant="bordered" className="p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-text-secondary">On-Deck Matchups</p>
-            <p className="mt-2 text-2xl font-bold text-text-primary">1</p>
-          </Card>
-
-          <Card variant="bordered" className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-warning-500">Kiosk Check-In</p>
-              <p className="text-xs text-text-tertiary">Test walk-in approval</p>
-            </div>
-            <Button variant="outline" size="sm">Simulate</Button>
-          </Card>
+              <Card variant="bordered" className="p-4 hover-lift">
+                <p className="text-label text-text-secondary">Avg Games/Player</p>
+                <p className="mt-2 text-stat-sm font-bold text-text-primary animate-count-up">
+                  {data && data.length > 0
+                    ? Math.round(data.reduce((sum, p) => sum + p.wins + p.losses + p.draws, 0) / data.length)
+                    : "—"}
+                </p>
+              </Card>
+            </>
+          )}
         </Grid>
 
         {/* Top 3 Featured Player Cards */}
-        {topThree.length > 0 && (
+        {loading && !data ? (
+          <Grid cols={3} gap={4} className="mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <TopPlayerCardSkeleton />
+            <TopPlayerCardSkeleton />
+            <TopPlayerCardSkeleton />
+          </Grid>
+        ) : topThree.length > 0 && (
           <Grid cols={3} gap={4} className="mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {topThree.map((player, idx) => (
-              <Card key={player.player_id || idx} variant={idx === 0 ? "elevated" : "bordered"} className="p-5 relative">
+              <Card key={player.player_id || idx} variant={idx === 0 ? "elevated" : "bordered"} className="p-5 relative hover-lift">
                 <Flex justify="between">
-                  <Badge variant="warning" size="sm">#{player.rank || idx + 1}</Badge>
+                  <Badge variant="warning" size="sm" className="animate-count-up">#{player.rank || idx + 1}</Badge>
                   <TierBadge tier={player.tier || "PRO"} />
                 </Flex>
 
-                <h3 className="mt-4 text-lg font-bold text-text-primary">{player.name}</h3>
+                <h3 className="mt-4 text-h3 font-bold text-text-primary">{player.name}</h3>
 
-                <Flex justify="between" className="mt-2 text-xs font-medium text-text-secondary">
+                <Flex justify="between" className="mt-2 text-label font-medium text-text-secondary">
                   <span>{player.wins}W – {player.losses}L – {player.draws}D</span>
-                  <span className="font-bold text-success-500">{player.win_rate}% Win Rate</span>
+                  <span className="font-bold text-success animate-count-up">{player.win_rate}% Win Rate</span>
                 </Flex>
               </Card>
             ))}
@@ -123,8 +207,8 @@ export default function RankingsPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1 rounded-xl bg-surface-sunken p-1 text-xs font-semibold text-text-secondary">
-              {["All", "Pro", "Advanced", "Intermediate", "Beginner"].map((tier) => (
+            <div className="flex flex-wrap items-center gap-1 rounded-xl bg-surface-sunken p-1 text-label font-semibold text-text-secondary">
+              {tierOptions.map((tier) => (
                 <Button
                   key={tier}
                   variant={selectedTier === tier ? "primary" : "ghost"}
@@ -141,7 +225,7 @@ export default function RankingsPage() {
           {error && <Alert type="error" className="p-5">{error}</Alert>}
 
           {loading && !data ? (
-            <div className="p-12 text-center"><Spinner /></div>
+            <TableSkeleton />
           ) : !data || filteredData.length === 0 ? (
             <EmptyState title="No players found" description="Rankings appear once games are finished with scores." className="p-8" />
           ) : (
@@ -164,7 +248,7 @@ export default function RankingsPage() {
                 <TableBody>
                   {filteredData.map((row) => (
                     <TableRow key={row.player_id} clickable className="hover:bg-surface-sunken">
-                      <TableCell className="font-bold text-text-tertiary">#{row.rank}</TableCell>
+                      <TableCell className="font-bold text-text-tertiary animate-count-up">#{row.rank}</TableCell>
                       <TableCell className="font-semibold text-text-primary">{row.name}</TableCell>
                       <TableCell><TierBadge tier={row.tier} /></TableCell>
                       <TableCell className="font-medium text-text-primary">{row.wins}W – {row.losses}L – {row.draws}D</TableCell>
@@ -172,15 +256,15 @@ export default function RankingsPage() {
                         <div className="flex items-center gap-3">
                           <div className="h-2 w-20 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800">
                             <div
-                              className="h-full rounded-full bg-warning-500"
+                              className="h-full rounded-full bg-primary animate-count-up"
                               style={{ width: `${Math.min(row.win_rate, 100)}%` }}
                             />
                           </div>
-                          <span className="font-semibold text-text-primary">{row.win_rate}%</span>
+                          <span className="font-semibold text-text-primary animate-count-up">{row.win_rate}%</span>
                         </div>
                       </TableCell>
-                      <TableCell className="font-semibold tabular-nums text-text-primary">{row.point_diff > 0 ? "+" : ""}{row.point_diff}</TableCell>
-                      <TableCell className="font-medium text-text-primary">{row.total_points}</TableCell>
+                      <TableCell className="font-semibold tabular-nums text-text-primary animate-count-up">{row.point_diff > 0 ? "+" : ""}{row.point_diff}</TableCell>
+                      <TableCell className="font-medium text-text-primary animate-count-up">{row.total_points}</TableCell>
                       <TableCell className="text-text-secondary">{formatDuration(row.avg_seconds)}</TableCell>
                       <TableCell className="text-right">
                         <Flex justify="end" gap={2}>

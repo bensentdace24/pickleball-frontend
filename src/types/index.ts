@@ -166,6 +166,16 @@ export interface Matchup {
   estimated_minutes?: number | null;
 }
 
+export interface AdminDashboardSnapshot {
+  courts: Court[];
+  queue: QueueEntry[];
+  games: Game[];
+  players: Player[];
+  matchups: Matchup[];
+  pending: QueueEntry[];
+  completed_games: number;
+}
+
 export type MatchType = "any" | "singles" | "doubles";
 
 // Additional types for player details and stats
@@ -216,27 +226,6 @@ export interface RecentGame {
   result: "win" | "loss" | "draw";
   duration_seconds: number | null;
   rank_change?: number | null; // NEW
-}
-
-export interface Analytics {
-  total_games: number;
-  total_players: number;
-  singles_games: number;
-  doubles_games: number;
-  time: {
-    counted_games: number;
-    avg_seconds: number | null;
-    fastest_seconds: number | null;
-    longest_seconds: number | null;
-  };
-  scores: {
-    close: number;
-    moderate: number;
-    lopsided: number;
-    avg_winning: number | null;
-    avg_losing: number | null;
-  };
-  top_players: RankingRow[];
 }
 
 export interface Analytics {

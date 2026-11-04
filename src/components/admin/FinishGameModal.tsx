@@ -64,7 +64,7 @@ export function FinishGameModal({
               value={scoreA}
               onChange={(e) => setScoreA(e.target.value)}
               placeholder="0"
-              className="text-center text-lg font-bold"
+              className="text-center text-stat-sm font-bold"
             />
           </Field>
           <Field label={`Team B${game.team_b?.players?.length ? ` (${game.team_b.players.map((p) => p.name).join(" / ")})` : ""}`}>
@@ -74,7 +74,7 @@ export function FinishGameModal({
               value={scoreB}
               onChange={(e) => setScoreB(e.target.value)}
               placeholder="0"
-              className="text-center text-lg font-bold"
+              className="text-center text-stat-sm font-bold"
             />
           </Field>
         </div>
@@ -82,7 +82,7 @@ export function FinishGameModal({
         {players.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-text-secondary">Put back in the queue?</p>
+              <p className="text-label text-text-secondary">Put back in the queue?</p>
               <button
                 type="button"
                 onClick={() =>
@@ -92,12 +92,12 @@ export function FinishGameModal({
                       : players.map((p) => p.id),
                   )
                 }
-                className="text-xs text-primary-600 underline hover:text-primary-700"
+                className="text-label text-primary underline hover:text-primary-hover"
               >
                 {requeue.length === players.length ? "Clear all" : "Select all"}
               </button>
             </div>
-            <div className="space-y-1 rounded-lg border border-border">
+            <div className="space-y-1 rounded-lg border border-border bg-surface-card">
               {players.map((p) => (
                 <Field key={p.id} className="flex items-center gap-3 px-3 py-2">
                   <Checkbox
@@ -108,7 +108,7 @@ export function FinishGameModal({
                 </Field>
               ))}
             </div>
-            <p className="text-xs text-text-tertiary">
+            <p className="text-label text-text-tertiary">
               Checked players join the back of the line with a new queue number.
             </p>
           </div>

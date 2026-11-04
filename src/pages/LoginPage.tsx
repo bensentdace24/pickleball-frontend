@@ -37,16 +37,17 @@ export default function LoginPage() {
   }
 
   return (
-    <Page withBackground>
-      <Container size="sm" className="py-12">
+    <Page withBackground className="min-h-screen">
+      <div className="page-hero fixed inset-0 z-0" aria-hidden="true" />
+      <Container size="sm" className="py-12 relative z-10">
         <Flex direction="col" align="center" className="w-full">
-          <Card variant="elevated" className="w-full max-w-sm p-6">
-            <div className="text-center mb-6">
-              <Badge variant="primary" dot className="mb-3 text-xs">
+          <Card variant="elevated" className="w-full max-w-sm p-6 sm:p-8 animate-modal-in">
+            <div className="text-center mb-6 sm:mb-8">
+              <Badge variant="primary" dot className="mb-3 text-label animate-count-up">
                 Pickleball Queue
               </Badge>
-              <h1 className="text-xl font-bold text-text-primary">Staff Login</h1>
-              <p className="mt-1 text-sm text-text-secondary">Front desk access</p>
+              <h1 className="text-h2 font-bold text-text-primary">Staff Login</h1>
+              <p className="mt-1 text-body text-text-secondary">Front desk access</p>
             </div>
 
             <form onSubmit={submit} className="flex flex-col gap-4">
@@ -58,6 +59,7 @@ export default function LoginPage() {
                   autoComplete="username"
                   required
                   placeholder="staff@club.com"
+                  autoFocus
                 />
               </Field>
 
@@ -72,17 +74,20 @@ export default function LoginPage() {
                 />
               </Field>
 
-              {error && <Alert type="error">{error}</Alert>}
+              {error && <Alert type="error" className="animate-modal-in">{error}</Alert>}
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full hover-lift"
                 disabled={busy || !email || !password}
               >
                 {busy ? "Signing in…" : "Sign in"}
               </Button>
             </form>
           </Card>
+          <p className="mt-6 text-center text-label text-text-tertiary">
+            MJ Pickle Hub · Club Management
+          </p>
         </Flex>
       </Container>
     </Page>

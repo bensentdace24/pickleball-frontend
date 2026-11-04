@@ -2,7 +2,17 @@ import type { ButtonHTMLAttributes, ReactNode, ForwardRefExoticComponent, RefAtt
 import { Loader2 } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "warning" | "accent" | "sky";
+type Variant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "success"
+  | "warning"
+  | "sky"
+  | "team-a"
+  | "team-b";
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,69 +27,80 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const sizeStyles: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-xs rounded-lg gap-1.5",
-  md: "px-4 py-2 text-sm rounded-xl gap-1.5",
-  lg: "px-5 py-2.5 text-base rounded-xl gap-2",
+  sm: "px-3 py-1.5 text-xs rounded-lg gap-1.5 min-h-[40px]",
+  md: "px-4 py-2 text-sm rounded-xl gap-1.5 min-h-[44px]",
+  lg: "px-5 py-2.5 text-base rounded-xl gap-2 min-h-[48px]",
 };
 
 const variantStyles: Record<Variant, string> = {
-  /* Court Green — primary actions, CTAs */
+  /* Primary — Court Green: PRIMARY ACTIONS ONLY (CTAs, start game, approve, save) */
   primary: `
-    bg-court-green-600 text-white
-    hover:bg-court-green-700 active:bg-court-green-800
+    bg-[var(--color-interactive-bg)] text-[var(--color-interactive-text)]
+    hover:bg-[var(--color-interactive-bg-hover)] active:bg-[var(--color-interactive-bg-active)]
     shadow-sm
-    focus-visible:ring-court-green-500
+    focus-visible:ring-[var(--color-border-focus)]
   `,
-  /* Ball Yellow — high-energy actions, attention */
-  accent: `
-    bg-ball-yellow-600 text-white
-    hover:bg-ball-yellow-700 active:bg-ball-yellow-800
-    shadow-sm
-    focus-visible:ring-ball-yellow-500
-  `,
-  /* Sky Blue — secondary actions, info */
-  sky: `
-    bg-sky-blue-600 text-white
-    hover:bg-sky-blue-700 active:bg-sky-blue-800
-    shadow-sm
-    focus-visible:ring-sky-blue-500
-  `,
-  /* Subtle elevated surface */
+  /* Secondary — Sky Blue: SECONDARY ACTIONS (form matchup, smart form, cancel matchup) */
   secondary: `
-    bg-surface-elevated text-text-primary border border-border
-    hover:bg-surface-sunken hover:border-border-strong
-    active:bg-border
-    focus-visible:ring-border-focus
+    bg-[var(--color-interactive-sky-bg)] text-[var(--color-interactive-sky-text)]
+    hover:bg-[var(--color-interactive-sky-bg-hover)] active:bg-[var(--color-interactive-sky-bg-active)]
+    shadow-sm
+    focus-visible:ring-[var(--color-sky-500)]
   `,
+  /* Sky Blue alias for secondary */
+  sky: `
+    bg-[var(--color-interactive-sky-bg)] text-[var(--color-interactive-sky-text)]
+    hover:bg-[var(--color-interactive-sky-bg-hover)] active:bg-[var(--color-interactive-sky-bg-active)]
+    shadow-sm
+    focus-visible:ring-[var(--color-sky-500)]
+  `,
+  /* Team A — Sky Blue: Team A assignment buttons */
+  "team-a": `
+    bg-[var(--color-team-a-bg)] text-[var(--color-team-a-text)] border border-[var(--color-team-a-border)]
+    hover:bg-[var(--color-team-a-bg)] hover:border-[var(--color-team-a)] hover:text-[var(--color-team-a)]
+    active:bg-[var(--color-team-a)] active:text-white
+    focus-visible:ring-[var(--color-sky-500)]
+  `,
+  /* Team B — Ball Amber: Team B assignment buttons */
+  "team-b": `
+    bg-[var(--color-team-b-bg)] text-[var(--color-team-b-text)] border border-[var(--color-team-b-border)]
+    hover:bg-[var(--color-team-b-bg)] hover:border-[var(--color-team-b)] hover:text-[var(--color-team-b)]
+    active:bg-[var(--color-team-b)] active:text-[var(--color-text-on-amber)]
+    focus-visible:ring-[var(--color-amber-500)]
+  `,
+  /* Subtle elevated surface — Ghost/outline style */
   outline: `
-    bg-transparent text-text-primary border border-border
-    hover:bg-surface-sunken hover:border-border-strong
-    active:bg-border
-    focus-visible:ring-border-focus
+    bg-transparent text-[var(--color-text-primary)] border border-[var(--color-border)]
+    hover:bg-[var(--color-surface-sunken)] hover:border-[var(--color-border-strong)]
+    active:bg-[var(--color-border)]
+    focus-visible:ring-[var(--color-border-focus)]
   `,
   ghost: `
-    bg-transparent text-text-primary
-    hover:bg-surface-sunken
-    active:bg-border
-    focus-visible:ring-border-focus
+    bg-transparent text-[var(--color-text-primary)]
+    hover:bg-[var(--color-surface-sunken)]
+    active:bg-[var(--color-border)]
+    focus-visible:ring-[var(--color-border-focus)]
   `,
+  /* Danger — Red: DESTRUCTIVE ACTIONS ONLY (cancel, reject, remove, delete) */
   danger: `
-    bg-danger-600 text-white
-    hover:bg-danger-700 active:bg-danger-800
+    bg-[var(--color-interactive-danger-bg)] text-[var(--color-interactive-danger-text)]
+    hover:bg-[var(--color-interactive-danger-bg-hover)] active:bg-[var(--color-interactive-danger-bg-active)]
     shadow-sm
-    focus-visible:ring-danger-500
+    focus-visible:ring-[var(--color-danger-500)]
   `,
+  /* Success — Court Green: Success confirmations (finish game, approve) */
   success: `
-    bg-court-green-600 text-white
-    hover:bg-court-green-700 active:bg-court-green-800
+    bg-[var(--color-interactive-bg)] text-[var(--color-interactive-text)]
+    hover:bg-[var(--color-interactive-bg-hover)] active:bg-[var(--color-interactive-bg-active)]
     shadow-sm
-    focus-visible:ring-court-green-500
+    focus-visible:ring-[var(--color-border-focus)]
   `,
+  /* Warning — Ball Amber: Attention needed (not destructive) */
   warning: `
-    bg-ball-yellow-600 text-white
-    hover:bg-ball-yellow-700 active:bg-ball-yellow-800
+    bg-[var(--color-interactive-amber-bg)] text-[var(--color-interactive-amber-text)]
+    hover:bg-[var(--color-interactive-amber-bg-hover)] active:bg-[var(--color-interactive-amber-bg-active)]
     shadow-sm
-    focus-visible:ring-ball-yellow-500
+    focus-visible:ring-[var(--color-amber-500)]
   `,
 };
 
@@ -88,6 +109,7 @@ const baseStyles = `
   transition-colors duration-fast
   disabled:cursor-not-allowed disabled:opacity-50
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+  font-family: var(--font-sans)
 `;
 
 const Button = ((
@@ -108,19 +130,34 @@ const Button = ((
 ) => {
   const isDisabled = disabled || loading;
   const Comp = asChild ? Slot : "button";
+  const buttonClassName = `
+    ${baseStyles}
+    ${variantStyles[variant]}
+    ${sizeStyles[size]}
+    ${fullWidth ? "w-full" : ""}
+    ${className}
+  `;
+
+  if (asChild) {
+    return (
+      <Slot
+        ref={ref}
+        className={buttonClassName}
+        aria-busy={loading}
+        aria-disabled={isDisabled}
+        {...props}
+      >
+        {children}
+      </Slot>
+    );
+  }
 
   return (
     <Comp
       ref={ref}
       type={props.type || "button"}
       disabled={isDisabled}
-      className={`
-        ${baseStyles}
-        ${variantStyles[variant]}
-        ${sizeStyles[size]}
-        ${fullWidth ? "w-full" : ""}
-        ${className}
-      `}
+      className={buttonClassName}
       aria-busy={loading}
       aria-disabled={isDisabled}
       {...props}
@@ -149,9 +186,9 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const iconButtonSizeStyles = {
-  sm: "h-8 w-8",
-  md: "h-10 w-10",
-  lg: "h-12 w-12",
+  sm: "h-9 w-9 min-w-[40px]",
+  md: "h-10 w-10 min-w-[44px]",
+  lg: "h-12 w-12 min-w-[48px]",
 };
 
 export function IconButton({
@@ -171,11 +208,11 @@ export function IconButton({
         inline-flex items-center justify-center rounded-lg
         transition-colors duration-fast
         disabled:cursor-not-allowed disabled:opacity-50
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus)] focus-visible:ring-offset-2
         ${iconButtonSizeStyles[size]}
-        ${variant === "default" ? "bg-surface-elevated text-text-primary border border-border hover:bg-surface-sunken" : ""}
-        ${variant === "outline" ? "bg-transparent text-text-primary border border-border hover:bg-surface-sunken" : ""}
-        ${variant === "ghost" ? "bg-transparent text-text-secondary hover:bg-surface-sunken hover:text-text-primary" : ""}
+        ${variant === "default" ? "bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-surface-sunken)]" : ""}
+        ${variant === "outline" ? "bg-transparent text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-surface-sunken)]" : ""}
+        ${variant === "ghost" ? "bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-text-primary)]" : ""}
         ${className}
       `}
       aria-label={ariaLabel}

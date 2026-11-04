@@ -73,7 +73,7 @@ export function FormMatchupModal({
 
       <div className="flex flex-col gap-4">
         <div>
-          <p className="text-sm font-medium text-text-secondary">Match type</p>
+          <p className="text-label text-text-secondary">Match type</p>
           <Flex gap={2} className="mt-1">
             <Button
               variant={matchSize === 4 ? "primary" : "outline"}
@@ -94,7 +94,7 @@ export function FormMatchupModal({
           </Flex>
         </div>
 
-        <p className="text-sm font-medium text-text-secondary">
+        <p className="text-label text-text-secondary">
           Team A ({countA}/{perSide}) vs Team B ({countB}/{perSide})
         </p>
         <Card variant="bordered" className="max-h-64 overflow-y-auto">
@@ -102,7 +102,7 @@ export function FormMatchupModal({
             {entries.map((entry) => {
               const side = sides[entry.id];
               return (
-                <li key={entry.id} className="flex items-center gap-2 px-3 py-2.5 text-sm">
+                <li key={entry.id} className="flex items-center gap-2 px-3 py-2.5 text-body">
                   <Badge variant="default" size="sm" className="shrink-0 font-semibold">
                     #{entry.queue_number}
                   </Badge>
@@ -122,7 +122,7 @@ export function FormMatchupModal({
                     A
                   </Button>
                   <Button
-                    variant={side === 1 ? "warning" : "ghost"}
+                    variant={side === 1 ? "team-b" : "ghost"}
                     size="sm"
                     disabled={side !== 1 && countB >= perSide}
                     onClick={() => setSide(entry.id, 1)}

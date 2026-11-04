@@ -39,13 +39,13 @@ function TimeRemaining({ endsAt }: { endsAt: string }) {
   );
 }
 
-function TeamColumn({ team, color }: { team: { name: string }[]; color: "primary" | "warning" }) {
+function TeamColumn({ team, color }: { team: { name: string }[]; color: "team-a" | "team-b" }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-3">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-text-secondary">
-        {color === "primary" ? "Team A" : "Team B"}
+    <div className="rounded-lg border border-border bg-surface-sunken p-3">
+      <p className="text-label text-text-secondary">
+        {color === "team-a" ? "Team A" : "Team B"}
       </p>
-      <p className="mt-1 text-sm font-medium text-text-primary">
+      <p className="mt-1 text-body font-medium text-text-primary">
         {team.map((player) => player.name).join(" & ") || "Player details unavailable"}
       </p>
     </div>
@@ -58,7 +58,7 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
       title="Active Matches"
       action={
         games && (
-          <Badge variant="success" className="text-xs">
+          <Badge variant="primary" className="text-label">
             {games.length} playing
           </Badge>
         )
@@ -86,8 +86,6 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
             </TableHeader>
             <TableBody>
               {games.map((game) => {
-                // We need to get team info - for now use placeholder since we don't have getCourtTeams here
-                // The actual team data would come from the game object
                 return (
                   <TableRow key={game.id}>
                     <TableCell>
@@ -95,13 +93,13 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
                         <span className="font-medium text-text-primary">
                           {game.court?.name ?? `Game #${game.id}`}
                         </span>
-                        <span className="text-xs text-text-tertiary">#{game.id}</span>
+                        <span className="text-label text-text-tertiary">#{game.id}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={game.status} />
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-body">
                       <Flex gap={2} align="center">
                         {game.ends_at ? (
                           <TimeRemaining endsAt={game.ends_at} />
@@ -115,13 +113,13 @@ export function ActiveGamesSection({ games, loading, busy, onFinish }: Props) {
                     <TableCell>
                       <TeamColumn
                         team={game.team_a?.players?.map(p => ({ name: p.name })) ?? []}
-                        color="primary"
+                        color="team-a"
                       />
                     </TableCell>
                     <TableCell>
                       <TeamColumn
                         team={game.team_b?.players?.map(p => ({ name: p.name })) ?? []}
-                        color="warning"
+                        color="team-b"
                       />
                     </TableCell>
                     <TableCell className="text-right">
